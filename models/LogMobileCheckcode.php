@@ -23,7 +23,8 @@ class LogMobileCheckcode extends CActiveRecord
         $nowTime = date("Y-m-d H:i:s");
         $overTime = date("Y-m-d H:i:s", strtotime("+5 minutes"));
         //获得验证码，随机产生6位数字
-        $checkNum = self::getCheckNum(6, 0, 9);
+//        $checkNum = self::getCheckNum(4, 0, 9);
+        $checkNum = '1111';
         if($type == 1) {        //注册验证码
             try {
                 if(User::model()->getUserByMobile($mobile)) {

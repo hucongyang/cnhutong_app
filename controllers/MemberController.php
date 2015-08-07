@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Class MemberController
+ */
 class MemberController extends ApiPublicController
 {
 
@@ -22,14 +25,6 @@ class MemberController extends ApiPublicController
         if(!isset($_REQUEST['mobile']) || !isset($_REQUEST['verifyType'])) {
             $this->_return('MSG_ERR_LESS_PARAM');
         }
-
-        $version            = Yii::app()->request->getParam('version', NULL);
-        $deviceId           = Yii::app()->request->getParam('deviceId', NULL);
-        $platform           = Yii::app()->request->getParam('platform', NULL);
-        $channel            = Yii::app()->request->getParam('channel', NULL);
-        $appVersion         = Yii::app()->request->getParam('appVersion', NULL);
-        $osVersion          = Yii::app()->request->getParam('osVersion', NULL);
-        $appId              = Yii::app()->request->getParam('appId', NULL);
 
         $mobile = Yii::app()->request->getParam('mobile', NUll);
         $type = Yii::app()->request->getParam('verifyType', NULL);

@@ -75,13 +75,15 @@ class HtLessonStudent extends CActiveRecord
                 $lesson['lessonArrangeId']                  = $row['lessonArrangeId'];
                 $lesson['lessonStudentId']                  = $row['lessonStudentId'];
                 $subjectInfo = ApiPublicLesson::model()->getSubjectInfoById($subjectId);
-                $lesson['subjectName']                       = $subjectInfo['title'];
+                $lesson['subjectName']                       = $subjectInfo['title'] . '课';
                 $lesson['subjectPic']                        = $subjectInfo['feature_img'];
-                $lesson['lessonSerial']                      = $row['lessonSerial'];
-                $lesson['lessonDate']                        = $row['lessonDate'] . ' ' . $row['lessonTime'];
+                $lesson['lessonSerial']                      = '第' . $row['lessonSerial'] . '课时';
+                $lessonDate = $row['lessonDate'];
+                $aDate = explode('-', $lessonDate);
+                $lesson['lessonDate']                        = $aDate[1] . '月' . $aDate[2] . '日' . ' ' . $row['lessonTime'];
                 $lesson['departmentId']                      = $row['departmentId'];
                 $departmentInfo = ApiPublicLesson::model()->getDepartmentInfoById($lesson['departmentId']);
-                $lesson['departmentName']                    = $departmentInfo['name'];
+                $lesson['departmentName']                    = $departmentInfo['name'] . '分院';
                 $data[] = $lesson;
             }
 
@@ -142,22 +144,22 @@ class HtLessonStudent extends CActiveRecord
                 $subject['subjectId']                         = $subjectId;
                 $subject['lessonArrangeId']                  = $row['id'];
                 $subjectInfo = ApiPublicLesson::model()->getSubjectInfoById($subjectId);
-                $subject['subjectName']                       = $subjectInfo['title'];
+                $subject['subjectName']                       = $subjectInfo['title'] . '课';
                 $subject['teacherId']                           = $row['teacher_id'];
-                $subject['teacherName']                         = ApiPublicLesson::model()->getNameByMemberId($row['teacher_id']);
+                $subject['teacherName']                         = ApiPublicLesson::model()->getNameByMemberId($row['teacher_id']) . '老师';
                 $cnt                                             = $row['cnt'];
                 $lessonNowSerial = ApiPublicLesson::model()->getLessonNowSerial($memberId, $row['id']);
-                $subject['lessonProgress']                      = $lessonNowSerial . '/' . $row['cnt'];
+                $subject['lessonProgress']                      = '已上' . $lessonNowSerial . '课时/共' . $row['cnt'] . '课时';
                 if($lessonNowSerial < $cnt) {
-                    $subject['lessonStatus']                        = '进行中';
+                    $subject['lessonStatus']                        = '1';
                 } elseif ($lessonNowSerial == $cnt) {
-                    $subject['lessonStatus']                        = '已完成';
+                    $subject['lessonStatus']                        = '0';
                 } else {
                     $subject['lessonStatus']                        = '';
                 }
                 $subject['departmentId']                      = $row['department_id'];
                 $departmentInfo = ApiPublicLesson::model()->getDepartmentInfoById($subject['departmentId']);
-                $subject['departmentName']                    = $departmentInfo['name'];
+                $subject['departmentName']                    = $departmentInfo['name'] . '分院';
                 $data[] = $subject;
             }
 
@@ -226,7 +228,7 @@ class HtLessonStudent extends CActiveRecord
                 $lessons['lessonStudentId']                     = $row['lessonStudentId'];
                 $lessons['lessonSerial']                        = $row['lessonSerial'];
                 $lessons['lessonDate']                          = $row['date'] . ' ' . $row['time'];
-                $lessons['lessonStatus']                        = self::getLessonStatus($row['step']);
+                $lessons['lessonStatus']                        = self::getLessonStatusNow($row['step']);
                 $lessons['lessonCharge']                        = $row['student_comment'];
 
                 $data[] = $lessons;
@@ -297,7 +299,7 @@ class HtLessonStudent extends CActiveRecord
                 $lessonDetail['lessonStudentId']                = $row['lessonStudentId'];
                 $lessonDetail['lessonSerial']                   = $row['lessonSerial'];
                 $lessonDetail['lessonDate']                     = $row['date'] . ' ' . $row['time'];
-                $lessonDetail['lessonStatus']                   = self::getLessonStatus($row['step']);
+                $lessonDetail['lessonStatus']                   = self::getLessonStatusNow($row['step']);
                 $lessonDetail['teacherId']                      = $row['teacherId'];
                 $lessonDetail['teacherName']                    = ApiPublicLesson::model()->getNameByMemberId($row['teacherId']);
                 $lessonDetail['lessonScore']                    = $row['student_rating'];
@@ -427,6 +429,26 @@ class HtLessonStudent extends CActiveRecord
                 return "顺延补课";
             case "8":
                 return "补课后弃课";
+            default:
+                return '';
+        }
+    }
+
+    /**
+     * 输入 状态 step 0-1-2
+     * 输出 对应的课时状态 未上，已上未平，已上已评
+     * @param $step
+     * @return string
+     */
+    public function getLessonStatusNow($step)
+    {
+        switch ($step) {
+            case "0":
+                return "未上";
+            case "1":
+                return "已上未平";
+            case "2":
+                return "已上已评";
             default:
                 return '';
         }
