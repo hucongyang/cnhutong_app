@@ -9,30 +9,37 @@ class ComAds extends CActiveRecord
 
     public function tableName()
     {
-        return '{{com_ads}}';
+        return 'com_ads';
     }
 
     public function getAds()
     {
+    	$time = date("Y-m-d H:i:s");
         $data = array();
         try {
-            $result = Yii::app()->cnhutong_user->createCommand()
+        	// 获取广告
+        	$table_name = $this->tableName();
+            $row = Yii::app()->cnhutong_user->createCommand()
                 ->select('id, picture, text, link')
-                ->from('com_ads')
-                ->queryAll();
-
-            // 判断数据是否为空数组
-            if(ApiPublicController::array_is_null($result)) {
-                $data[] = [];
+                ->from($table_name)
+                ->where('starts_ts<=:Time and end_ts>=:Time and status=0',
+                	array(':Time' => $time))
+                ->order('id desc')
+                ->limit(1)
+                ->queryRow();
+            
+            if($row != NULL) {
+	            $ads = array();
+	            $ads['adPicture'] = $row['picture'];
+	            $ads['adContent'] = $row['text'];
+	            $ads['adUrl'] = $row['link'];
+	            $data[]  = $ads;
+	            
+	            // TODO : 广告统计 
+	            
             }
-
-            foreach($result as $row) {
-                $ads = array();
-                $ads['adPicture']               = $row['picture'];
-                $ads['adContent']               = $row['text'];
-                $ads['adUrl']                    = $row['link'];
-                $data[]    = $ads;
-            }
+            
+            
         } catch (Exception $e) {
             error_log($e);
         }

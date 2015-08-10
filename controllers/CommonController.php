@@ -15,7 +15,7 @@ class CommonController extends ApiPublicController
         // 非必须
         $userId = Yii::app()->request->getParam('userId', NULL);
 
-        $version            = Yii::app()->request->getParam('version', NULL);
+         
         $deviceId           = Yii::app()->request->getParam('deviceId', NULL);
         $platform           = Yii::app()->request->getParam('platform', NULL);
         $channel            = Yii::app()->request->getParam('channel', NULL);
