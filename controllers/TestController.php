@@ -102,6 +102,8 @@ class TestController extends ApiPublicController
             $this->_return('MSG_ERR_FAIL_TOKEN');
         } elseif ($data === 20012) {
             $this->_return('MSG_ERR_FAIL_TESTID');
+        } elseif ($data === 20023) {
+            $this->_return('MSG_ERR_QUESTION');
         }
 
         // 记录log

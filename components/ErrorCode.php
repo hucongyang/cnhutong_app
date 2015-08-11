@@ -8,7 +8,7 @@
  
 $_error_code = array(
 		// 基本错误码
-		'MSG_SUCCESS' 				=> array('10000', '登录成功'),
+		'MSG_SUCCESS' 				=> array('10000', '成功'),
 		'MSG_ERR_LESS_PARAM' 		=> array('10001', '请求缺少必要的参数'),
 		'MSG_ERR_FAIL_PARAM' 		=> array('10002', '请求参数错误'),
 
@@ -54,6 +54,8 @@ $_error_code = array(
         'MSG_ERR_LESSON_STUDENT_ID'       => array('20021', '课时唯一编号错误'),
 
         'MSG_ERR_SCORE'                     => array('20022', '评分不在范围内(0-5分)'),
+
+        'MSG_ERR_QUESTION'                  => array('20023', '题目顺序错误'),
 
 		// 其它
 		'MSG_ERR_UNKOWN'			=> array('99999', '未知错误')
