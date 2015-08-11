@@ -27,18 +27,18 @@ class HtLessonStudent extends CActiveRecord
             // 用户ID验证
             $user = User::model()->IsUserId($userId);
             if(!$user) {
-                return 10010;       // MSG_ERR_FAIL_USER
+                return 20008;       // MSG_ERR_FAIL_USER
             }
             // 用户token验证
             $userToken = UserToken::model()->IsToken($userId, $token);
 //            var_dump($userToken);exit;
             if(!$userToken) {
-                return 10009;       // MSG_ERR_FAIL_TOKEN
+                return 20007;       // MSG_ERR_FAIL_TOKEN
             }
 
             $isExistUserMemberId = UserMember::model()->IsExistMemberId($userId, $memberId);
             if(!$isExistUserMemberId) {
-                return 40003;        // MSG_ERR_FAIL_MEMBER
+                return 20017;        // MSG_ERR_FAIL_MEMBER
             }
 
             $result = Yii::app()->cnhutong->createCommand()
@@ -60,10 +60,6 @@ class HtLessonStudent extends CActiveRecord
             if(ApiPublicController::array_is_null($result)) {
                 $data[] = [];
             }
-
-//            if(empty($result)) {
-//                $data[] = [];
-//            }
 
             foreach($result as $row) {
                 // 获取数据
@@ -108,18 +104,18 @@ class HtLessonStudent extends CActiveRecord
             // 用户ID验证
             $user = User::model()->IsUserId($userId);
             if(!$user) {
-                return 10010;       // MSG_ERR_FAIL_USER
+                return 20008;       // MSG_ERR_FAIL_USER
             }
             // 用户token验证
             $userToken = UserToken::model()->IsToken($userId, $token);
 //            var_dump($userToken);exit;
             if(!$userToken) {
-                return 10009;       // MSG_ERR_FAIL_TOKEN
+                return 20007;       // MSG_ERR_FAIL_TOKEN
             }
 
             $isExistUserMemberId = UserMember::model()->IsExistMemberId($userId, $memberId);
             if(!$isExistUserMemberId) {
-                return 40003;        // MSG_ERR_FAIL_MEMBER
+                return 20017;        // MSG_ERR_FAIL_MEMBER
             }
 
             $result = Yii::app()->cnhutong->createCommand()
@@ -185,23 +181,23 @@ class HtLessonStudent extends CActiveRecord
             // 用户ID验证
             $user = User::model()->IsUserId($userId);
             if(!$user) {
-                return 10010;       // MSG_ERR_FAIL_USER
+                return 20008;       // MSG_ERR_FAIL_USER
             }
             // 用户token验证
             $userToken = UserToken::model()->IsToken($userId, $token);
 //            var_dump($userToken);exit;
             if(!$userToken) {
-                return 10009;       // MSG_ERR_FAIL_TOKEN
+                return 20007;       // MSG_ERR_FAIL_TOKEN
             }
 
             $isExistUserMemberId = UserMember::model()->IsExistMemberId($userId, $memberId);
             if(!$isExistUserMemberId) {
-                return 40003;        // MSG_ERR_FAIL_MEMBER
+                return 20017;        // MSG_ERR_FAIL_MEMBER
             }
 
             $isLessonArrangeId = self::IsLessonArrangeId($memberId, $lessonArrangeId);
             if(!$isLessonArrangeId) {
-                return 60001;
+                return 20020;
             }
 
             $result = Yii::app()->cnhutong->createCommand()
@@ -256,23 +252,23 @@ class HtLessonStudent extends CActiveRecord
             // 用户ID验证
             $user = User::model()->IsUserId($userId);
             if(!$user) {
-                return 10010;       // MSG_ERR_FAIL_USER
+                return 20008;       // MSG_ERR_FAIL_USER
             }
             // 用户token验证
             $userToken = UserToken::model()->IsToken($userId, $token);
 //            var_dump($userToken);exit;
             if(!$userToken) {
-                return 10009;       // MSG_ERR_FAIL_TOKEN
+                return 20007;       // MSG_ERR_FAIL_TOKEN
             }
 
             $isExistUserMemberId = UserMember::model()->IsExistMemberId($userId, $memberId);
             if(!$isExistUserMemberId) {
-                return 40003;        // MSG_ERR_FAIL_MEMBER
+                return 20017;        // MSG_ERR_FAIL_MEMBER
             }
 
             $isLessonStudentId = self::IsLessonStudentId($memberId, $lessonStudentId);
             if(!$isLessonStudentId) {
-                return 60002;
+                return 20021;
             }
 
             $result = Yii::app()->cnhutong->createCommand()
@@ -339,27 +335,27 @@ class HtLessonStudent extends CActiveRecord
             // 用户ID验证
             $user = User::model()->IsUserId($userId);
             if(!$user) {
-                return 10010;       // MSG_ERR_FAIL_USER
+                return 20008;       // MSG_ERR_FAIL_USER
             }
             // 用户token验证
             $userToken = UserToken::model()->IsToken($userId, $token);
 //            var_dump($userToken);exit;
             if(!$userToken) {
-                return 10009;       // MSG_ERR_FAIL_TOKEN
+                return 20007;       // MSG_ERR_FAIL_TOKEN
             }
 
             $isExistUserMemberId = UserMember::model()->IsExistMemberId($userId, $memberId);
             if(!$isExistUserMemberId) {
-                return 40003;        // MSG_ERR_FAIL_MEMBER
+                return 200017;        // MSG_ERR_FAIL_MEMBER
             }
 
             $isLessonStudentId = self::IsLessonStudentId($memberId, $lessonStudentId);
             if(!$isLessonStudentId) {
-                return 60002;
+                return 20021;
             }
 
             if($score < 0 || $score > 5) {
-                return 70001;
+                return 20022;
             }
 
             $result = Yii::app()->cnhutong->createCommand()

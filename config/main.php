@@ -7,7 +7,7 @@
 // CWebApplication properties can be configured here.
 return array(
 	'basePath'=>dirname(__FILE__).DIRECTORY_SEPARATOR.'..',
-	'name'=>'秦汉胡同app',
+	'name'=>'秦汉胡同学员指纹签到系统',
     'timeZone'=>'Asia/Shanghai',
 	'defaultController'=>'Index',
 	
@@ -36,8 +36,9 @@ return array(
 		),
 		// uncomment the following to use a MySQL database
 
-		'cnhutong_user'=>array(
-            'connectionString' => 'mysql:host=127.0.0.1;dbname=cnhutong_user',
+        // 对接数据库
+        'cnhutong'=>array(
+            'connectionString' => 'mysql:host=127.0.0.1;dbname=cnhutong',
             'emulatePrepare' => true,
             'username' => 'root',
             'password' => '111111',
@@ -45,9 +46,9 @@ return array(
             'class' =>  'CDbConnection',
             //'tablePrefix' => 'tbl_',
         ),
-        // 对接数据库
-        'cnhutong'=>array(
-            'connectionString' => 'mysql:host=127.0.0.1;dbname=cnhutong',
+
+        'cnhutong_user'=>array(
+            'connectionString' => 'mysql:host=127.0.0.1;dbname=cnhutong_user',
             'emulatePrepare' => true,
             'username' => 'root',
             'password' => '111111',

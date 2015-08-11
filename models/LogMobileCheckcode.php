@@ -28,7 +28,7 @@ class LogMobileCheckcode extends CActiveRecord
         if($type == 1) {        //注册验证码
             try {
                 if(User::model()->getUserByMobile($mobile)) {
-                    return 10003;       //MSG_ERR_INVALID_MOBILE
+                    return 20001;       //MSG_ERR_INVALID_MOBILE
                 }
                 //该手机号码第一次发送验证码，insert
                 if(!self::getIsExistMobile($mobile)) {
@@ -62,7 +62,7 @@ class LogMobileCheckcode extends CActiveRecord
         } elseif ($type == 2) {     //找回密码验证码
             try {
                 if(!User::model()->getUserByMobile($mobile)) {
-                    return 10006;        //MSG_ERR_UN_REGISTER_MOBILE
+                    return 20004;        //MSG_ERR_UN_REGISTER_MOBILE
                 }
                 // 该手机号码不在mobile_checkcode表里面(ps:删除了) insert
                 if(!self::getIsExistMobile($mobile)) {
@@ -96,7 +96,7 @@ class LogMobileCheckcode extends CActiveRecord
         } elseif ($type == 3) {        //  绑定手机发送验证码
             try {
                 if(User::model()->getUserByMobile($mobile)) {
-                    return 30001;       //  MSG_ERR_INVALID_BIND_MOBILE
+                    return 20014;       //  MSG_ERR_INVALID_BIND_MOBILE
                 }
                 //该手机号码第一次发送验证码，insert
                 if(!self::getIsExistMobile($mobile)) {

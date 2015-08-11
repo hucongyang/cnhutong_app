@@ -58,31 +58,31 @@ class UserMember extends CActiveRecord
             // 验证userId
             $user = User::model()->IsUserId($userId);
             if(!$user) {
-                return 10010;       // MSG_ERR_FAIL_USER
+                return 20008;       // MSG_ERR_FAIL_USER
             }
             // 验证token
             $userToken = UserToken::model()->IsToken($userId, $token);
             if(!$userToken) {
-                return 10009;       // MSG_ERR_FAIL_TOKEN
+                return 20007;       // MSG_ERR_FAIL_TOKEN
             }
             // 验证学员ID数量，目前最多绑定3个
             $countMemberId = self::getBindMemberNum($userId);
             if($countMemberId <=0 || $countMemberId >= 3) {
-                return 20006;
+                return 20013;
             }
             //口令salt 不能为空
             if(!$salt) {
-                return 40004;       // MSG_ERR_NULL_SALT
+                return 20018;       // MSG_ERR_NULL_SALT
             }
             // 获取memberId
             $memberId = self::getMemberIdBySalt($salt);
             if(!$memberId) {
-                return 40001;       // MSG_ERR_SALT
+                return 20015;       // MSG_ERR_SALT
             }
             // salt 口令是否已使用
             $userMemberId = self::IsExistMemberId($userId, $memberId);
             if($userMemberId) {
-                return 40002;       // MSG_ERR_INVALID_SALT
+                return 20016;       // MSG_ERR_INVALID_SALT
             }
             // 验证通过后，insert数据
             $nowTime = date("Y-m-d", strtotime("now"));
@@ -122,17 +122,17 @@ class UserMember extends CActiveRecord
             // 验证userId
             $user = User::model()->IsUserId($userId);
             if(!$user) {
-                return 10010;       // MSG_ERR_FAIL_USER
+                return 20008;       // MSG_ERR_FAIL_USER
             }
             // 验证token
             $userToken = UserToken::model()->IsToken($userId, $token);
             if(!$userToken) {
-                return 10009;       // MSG_ERR_FAIL_TOKEN
+                return 20007;       // MSG_ERR_FAIL_TOKEN
             }
             // 验证要删除的memberId 是否存在
             $userMemberId = self::IsExistMemberId($userId, $memberId);
             if(!$userMemberId) {
-                return 40003;       // MSG_ERR_FAIL_MEMBER
+                return 20017;       // MSG_ERR_FAIL_MEMBER
             }
             // 验证通过后，解除学员id的绑定
             $delete_member = Yii::app()->cnhutong_user->createCommand()

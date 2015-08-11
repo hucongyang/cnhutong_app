@@ -22,11 +22,11 @@ class User extends CActiveRecord
     {
         try {
             if(self::getUserByMobile($mobile)) {
-                return 10003;       // MSG_ERR_INVALID_MOBILE
+                return 20001;       // MSG_ERR_INVALID_MOBILE
             }
             // 验证码是否过期
             if(!LogMobileCheckcode::model()->checkCode($mobile, $checkNum)) {
-                return 10005;       //  MSG_ERR_CODE_OVER_TIME   验证码过期
+                return 20003;       //  MSG_ERR_CODE_OVER_TIME   验证码过期
             }
         } catch (Exception $e) {
             error_log($e);
@@ -51,11 +51,11 @@ class User extends CActiveRecord
         $data = array();
         try {
             if(self::getUserByMobile($mobile)) {
-                return 10003;       // MSG_ERR_INVALID_MOBILE
+                return 20001;       // MSG_ERR_INVALID_MOBILE
             }
             // 验证码是否过期
             if(!LogMobileCheckcode::model()->checkCode($mobile, $checkNum)) {
-                return 10005;       //  MSG_ERR_CODE_OVER_TIME   验证码过期
+                return 20003;       //  MSG_ERR_CODE_OVER_TIME   验证码过期
             }
             // 注册成功插入数据
             $registerTime = date("Y-m-d H-i-s", strtotime("now"));        //用户注册时间
@@ -245,7 +245,7 @@ class User extends CActiveRecord
                     return $data;
                 } else {
                     // 有账号密码,绑定了手机号,账号密码登录
-                    return 50000;
+                    return 20019;           // MSG_MOBILE_PASSWORD_LOGIN
                 }
             }
 
@@ -271,16 +271,16 @@ class User extends CActiveRecord
         try {
             $user = self::IsUserId($userId);
             if(!$user) {
-                return 10010;       //  MSG_ERR_FAIL_USER
+                return 20008;       //  MSG_ERR_FAIL_USER
             }
             $userToken = UserToken::model()->IsToken($userId, $token);
 //            var_dump($userToken);exit;
             if(!$userToken) {
-                return 10009;       //  MSG_ERR_FAIL_TOKEN
+                return 20007;       //  MSG_ERR_FAIL_TOKEN
             }
             $mobile_checkcode = LogMobileCheckcode::model()->checkCode($mobile, $checkNum);
             if(!$mobile_checkcode) {
-                return 10005;           //  MSG_ERR_CODE_OVER_TIME
+                return 20003;           //  MSG_ERR_CODE_OVER_TIME
             }
             // 用户手机绑定成功后 update
             $recommand = self::getUserByMobile($referee);                   // 推荐人用户ID
@@ -339,11 +339,11 @@ class User extends CActiveRecord
         try {
             $user = self::getUserByMobile($mobile);
             if(!$user) {
-                return 10006;           // MSG_ERR_UN_REGISTER_MOBILE
+                return 20004;           // MSG_ERR_UN_REGISTER_MOBILE
             }
             $userId = self::getUserByMobilePassword($mobile, $password);
             if(!$userId) {
-                return 10007;           //  MSG_ERR_FAIL_PASSWORD
+                return 20005;           //  MSG_ERR_FAIL_PASSWORD
             }
             //userId
             $data['userId'] = $userId;
@@ -376,14 +376,14 @@ class User extends CActiveRecord
         try {
             $user = self::IsUserId($userId);
             if(!$user) {
-                return 10010;       //  MSG_ERR_FAIL_USER
+                return 20008;       //  MSG_ERR_FAIL_USER
             }
             $userAuto = self::IsAutoLogin($userId);
             if(!$userAuto) {
                 $userToken = UserToken::model()->IsToken($userId, $token);
                 //            var_dump($userToken);exit;
                 if(!$userToken) {
-                    return 10009;       //  MSG_ERR_FAIL_TOKEN
+                    return 20007;       //  MSG_ERR_FAIL_TOKEN
                 }
             }
 
@@ -420,11 +420,11 @@ class User extends CActiveRecord
         try {
             $userId = self::getUserByMobile($mobile);
             if(!$userId) {
-                return 10006;           //  MSG_ERR_UN_REGISTER_MOBILE
+                return 20004;           //  MSG_ERR_UN_REGISTER_MOBILE
             }
             $mobile_checkcode = LogMobileCheckcode::model()->checkCode($mobile, $checkNum);
             if(!$mobile_checkcode) {
-                return 10005;           //  MSG_ERR_CODE_OVER_TIME
+                return 20003;           //  MSG_ERR_CODE_OVER_TIME
             }
             //手机号码已注册且验证码正确  update
             Yii::app()->cnhutong_user->createCommand()

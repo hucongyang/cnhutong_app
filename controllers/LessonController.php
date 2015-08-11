@@ -25,21 +25,13 @@ class LessonController extends ApiPublicController
         $token = Yii::app()->request->getParam('token', NULL);
         $memberId = Yii::app()->request->getParam('memberId', NULL);
 
-        $version            = Yii::app()->request->getParam('version', NULL);
-        $deviceId           = Yii::app()->request->getParam('deviceId', NULL);
-        $platform           = Yii::app()->request->getParam('platform', NULL);
-        $channel            = Yii::app()->request->getParam('channel', NULL);
-        $appVersion         = Yii::app()->request->getParam('appVersion', NULL);
-        $osVersion          = Yii::app()->request->getParam('osVersion', NULL);
-        $appId              = Yii::app()->request->getParam('appId', NULL);
-
         $data = HtLessonStudent::model()->nextLessonList($userId, $token, $memberId);
 //        var_dump($data);exit;
-        if($data === 10010) {
+        if($data === 20008) {
             $this->_return('MSG_ERR_FAIL_USER');
-        } elseif ($data === 10009) {
+        } elseif ($data === 20007) {
             $this->_return('MSG_ERR_FAIL_TOKEN');
-        } elseif ($data === 40003) {
+        } elseif ($data === 20017) {
             $this->_return('MSG_ERR_FAIL_MEMBER');
         }
 
@@ -70,20 +62,12 @@ class LessonController extends ApiPublicController
         $token = Yii::app()->request->getParam('token', NULL);
         $memberId = Yii::app()->request->getParam('memberId', NULL);
 
-        $version            = Yii::app()->request->getParam('version', NULL);
-        $deviceId           = Yii::app()->request->getParam('deviceId', NULL);
-        $platform           = Yii::app()->request->getParam('platform', NULL);
-        $channel            = Yii::app()->request->getParam('channel', NULL);
-        $appVersion         = Yii::app()->request->getParam('appVersion', NULL);
-        $osVersion          = Yii::app()->request->getParam('osVersion', NULL);
-        $appId              = Yii::app()->request->getParam('appId', NULL);
-
         $data = HtLessonStudent::model()->allSubjects($userId, $token, $memberId);
-        if($data === 10010) {
+        if($data === 20008) {
             $this->_return('MSG_ERR_FAIL_USER');
-        } elseif ($data === 10009) {
+        } elseif ($data === 20007) {
             $this->_return('MSG_ERR_FAIL_TOKEN');
-        } elseif ($data === 40003) {
+        } elseif ($data === 20017) {
             $this->_return('MSG_ERR_FAIL_MEMBER');
         }
 
@@ -116,22 +100,14 @@ class LessonController extends ApiPublicController
         $memberId = Yii::app()->request->getParam('memberId', NULL);
         $lessonArrangeId = Yii::app()->request->getParam('lessonArrangeId', NULL);
 
-        $version            = Yii::app()->request->getParam('version', NULL);
-        $deviceId           = Yii::app()->request->getParam('deviceId', NULL);
-        $platform           = Yii::app()->request->getParam('platform', NULL);
-        $channel            = Yii::app()->request->getParam('channel', NULL);
-        $appVersion         = Yii::app()->request->getParam('appVersion', NULL);
-        $osVersion          = Yii::app()->request->getParam('osVersion', NULL);
-        $appId              = Yii::app()->request->getParam('appId', NULL);
-
         $data = HtLessonStudent::model()->SubjectSchedule($userId, $token, $memberId, $lessonArrangeId);
-        if($data === 10010) {
+        if($data === 20008) {
             $this->_return('MSG_ERR_FAIL_USER');
-        } elseif ($data === 10009) {
+        } elseif ($data === 20007) {
             $this->_return('MSG_ERR_FAIL_TOKEN');
-        } elseif ($data === 40003) {
+        } elseif ($data === 20017) {
             $this->_return('MSG_ERR_FAIL_MEMBER');
-        } elseif ($data === 60001) {
+        } elseif ($data === 20020) {
             $this->_return('MSG_ERR_LESSON_ARRANGE_ID');
         }
 
@@ -164,22 +140,14 @@ class LessonController extends ApiPublicController
         $memberId = Yii::app()->request->getParam('memberId', NULL);
         $lessonStudentId = Yii::app()->request->getParam('lessonStudentId', NULL);
 
-        $version            = Yii::app()->request->getParam('version', NULL);
-        $deviceId           = Yii::app()->request->getParam('deviceId', NULL);
-        $platform           = Yii::app()->request->getParam('platform', NULL);
-        $channel            = Yii::app()->request->getParam('channel', NULL);
-        $appVersion         = Yii::app()->request->getParam('appVersion', NULL);
-        $osVersion          = Yii::app()->request->getParam('osVersion', NULL);
-        $appId              = Yii::app()->request->getParam('appId', NULL);
-
         $data = HtLessonStudent::model()->lessonDetails($userId, $token, $memberId, $lessonStudentId);
-        if($data === 10010) {
+        if($data === 20008) {
             $this->_return('MSG_ERR_FAIL_USER');
-        } elseif ($data === 10009) {
+        } elseif ($data === 20007) {
             $this->_return('MSG_ERR_FAIL_TOKEN');
-        } elseif ($data === 40003) {
+        } elseif ($data === 20017) {
             $this->_return('MSG_ERR_FAIL_MEMBER');
-        } elseif ($data === 60002) {
+        } elseif ($data === 20021) {
             $this->_return('MSG_ERR_LESSON_STUDENT_ID');
         }
         // 记录log
@@ -216,24 +184,16 @@ class LessonController extends ApiPublicController
         $score = Yii::app()->request->getParam('score', NUll);
         $stateComment = Yii::app()->request->getParam('statement', NUll);
 
-        $version            = Yii::app()->request->getParam('version', NULL);
-        $deviceId           = Yii::app()->request->getParam('deviceId', NULL);
-        $platform           = Yii::app()->request->getParam('platform', NULL);
-        $channel            = Yii::app()->request->getParam('channel', NULL);
-        $appVersion         = Yii::app()->request->getParam('appVersion', NULL);
-        $osVersion          = Yii::app()->request->getParam('osVersion', NULL);
-        $appId              = Yii::app()->request->getParam('appId', NULL);
-
         $data = HtLessonStudent::model()->lessonStudent($userId, $token, $memberId, $lessonStudentId, $score, $stateComment);
-        if($data === 10010) {
+        if($data === 20008) {
             $this->_return('MSG_ERR_FAIL_USER');
-        } elseif ($data === 10009) {
+        } elseif ($data === 20007) {
             $this->_return('MSG_ERR_FAIL_TOKEN');
-        } elseif ($data === 40003) {
+        } elseif ($data === 20017) {
             $this->_return('MSG_ERR_FAIL_MEMBER');
-        } elseif ($data === 60002) {
+        } elseif ($data === 20021) {
             $this->_return('MSG_ERR_LESSON_STUDENT_ID');
-        } elseif ($data === 70001) {
+        } elseif ($data === 20022) {
             $this->_return('MSG_ERR_SCORE');
         }
         // 记录log
@@ -270,18 +230,10 @@ class LessonController extends ApiPublicController
         $leaveType = Yii::app()->request->getParam('leaveType', NUll);
         $issue = Yii::app()->request->getParam('issue', NUll);
 
-        $version            = Yii::app()->request->getParam('version', NULL);
-        $deviceId           = Yii::app()->request->getParam('deviceId', NULL);
-        $platform           = Yii::app()->request->getParam('platform', NULL);
-        $channel            = Yii::app()->request->getParam('channel', NULL);
-        $appVersion         = Yii::app()->request->getParam('appVersion', NULL);
-        $osVersion          = Yii::app()->request->getParam('osVersion', NULL);
-        $appId              = Yii::app()->request->getParam('appId', NULL);
-
         $data = HtLessonStudent::model()->lessonStudentLeave($userId, $token, $memberId, $lessonStudentId, $leaveType, $issue);
-        if($data === 10010) {
+        if($data === 20008) {
             $this->_return('MSG_ERR_FAIL_USER');
-        } elseif ($data === 10009) {
+        } elseif ($data === 20007) {
             $this->_return('MSG_ERR_FAIL_TOKEN');
         }
         // 记录log

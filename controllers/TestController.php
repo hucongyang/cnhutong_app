@@ -35,9 +35,9 @@ class TestController extends ApiPublicController
 
         $data = UserQuestionHistory::model()->getTestUsers($userId, $token);
 //        var_dump($data);exit;
-        if($data === 10010) {
+        if($data === 20008) {
             $this->_return('MSG_ERR_FAIL_USER');
-        } elseif ($data === 10009) {
+        } elseif ($data === 20007) {
             $this->_return('MSG_ERR_FAIL_TOKEN');
         }
 
@@ -67,22 +67,41 @@ class TestController extends ApiPublicController
         $token = Yii::app()->request->getParam('token', NULL);
         $subject = Yii::app()->request->getParam('subject', NULL);
 
-        $version            = Yii::app()->request->getParam('version', NULL);
-        $deviceId           = Yii::app()->request->getParam('deviceId', NULL);
-        $platform           = Yii::app()->request->getParam('platform', NULL);
-        $channel            = Yii::app()->request->getParam('channel', NULL);
-        $appVersion         = Yii::app()->request->getParam('appVersion', NULL);
-        $osVersion          = Yii::app()->request->getParam('osVersion', NULL);
-        $appId              = Yii::app()->request->getParam('appId', NULL);
-
         $data = ComQuestion::model()->getTestList($userId, $token, $subject);
         //        var_dump($data);exit;
-        if($data === 10010) {
+        if($data === 20008) {
             $this->_return('MSG_ERR_FAIL_USER');
-        } elseif ($data === 10009) {
+        } elseif ($data === 20007) {
             $this->_return('MSG_ERR_FAIL_TOKEN');
-        } elseif ($data === 10012) {
+        } elseif ($data === 20010) {
             $this->_return('MSG_ERR_FAIL_SUBJECT');
+        }
+
+        // 记录log
+
+        $this->_return('MSG_SUCCESS', $data);
+    }
+
+    public function actionPostTestAnswer()
+    {
+        // 检查参数
+        if(!isset($_REQUEST['userId']) || !isset($_REQUEST['token']) || !isset($_REQUEST['testId']) || !isset($_REQUEST['answer']))
+        {
+            $this->_return('MSG_ERR_LESS_PARAM');
+        }
+
+        $userId = Yii::app()->request->getParam('userId', NULL);
+        $token = Yii::app()->request->getParam('token', NULL);
+        $testId = Yii::app()->request->getParam('testId', NULL);
+        $answer = Yii::app()->request->getParam('answer', NULL);
+
+        $data = UserQuestionHistory::model()->postTestAnswer($userId, $token, $testId, $answer);
+        if($data === 20008) {
+            $this->_return('MSG_ERR_FAIL_USER');
+        } elseif ($data === 20007) {
+            $this->_return('MSG_ERR_FAIL_TOKEN');
+        } elseif ($data === 20012) {
+            $this->_return('MSG_ERR_FAIL_TESTID');
         }
 
         // 记录log

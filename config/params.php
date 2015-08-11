@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 //defined('ADMIN_HOST') or define('ADMIN_HOST', 'http://122.227.43.176/admin');
 //defined('API_HOST') or define('API_HOST', 'http://122.227.43.176/index.php/');
 
@@ -8,7 +8,11 @@ return array(
     'title' => 'CnHuTong Finger Sign System',
     // this is used in error pages
     'adminEmail' => 'admin@mokun.com',
-    
+
+    // 官网 Android / IOS 渠道编号
+    'channel_cnhtuong_ios' => '1000',
+    'channel_cnhtuong_android' => '2000',
+
     // 用户请求前缀
     'url_base' => 'http://10.0.0.65/',
     // IOS最新版本号

@@ -15,14 +15,6 @@ class CommonController extends ApiPublicController
         // 非必须
         $userId = Yii::app()->request->getParam('userId', NULL);
 
-         
-        $deviceId           = Yii::app()->request->getParam('deviceId', NULL);
-        $platform           = Yii::app()->request->getParam('platform', NULL);
-        $channel            = Yii::app()->request->getParam('channel', NULL);
-        $appVersion         = Yii::app()->request->getParam('appVersion', NULL);
-        $osVersion          = Yii::app()->request->getParam('osVersion', NULL);
-        $appId              = Yii::app()->request->getParam('appId', NULL);
-
         $data = ComDepartment::model()->getAllSchools();
         if(!$data) {
             $this->_return('MSG_ERR_UNKOWN');
@@ -48,14 +40,6 @@ class CommonController extends ApiPublicController
         $userId = Yii::app()->request->getParam('userId', NULL);
         // 必须
         $departmentId = Yii::app()->request->getParam('departmentId', NULL);
-
-        $version            = Yii::app()->request->getParam('version', NULL);
-        $deviceId           = Yii::app()->request->getParam('deviceId', NULL);
-        $platform           = Yii::app()->request->getParam('platform', NULL);
-        $channel            = Yii::app()->request->getParam('channel', NULL);
-        $appVersion         = Yii::app()->request->getParam('appVersion', NULL);
-        $osVersion          = Yii::app()->request->getParam('osVersion', NULL);
-        $appId              = Yii::app()->request->getParam('appId', NULL);
 
         $data = array();
         $school = ComDepartment::model()->getSchoolInfo($departmentId);
@@ -94,14 +78,6 @@ class CommonController extends ApiPublicController
         $mobile             = Yii::app()->request->getParam('mobile', NULL);
         $subject            = Yii::app()->request->getParam('subject', NUll);
 
-        $version            = Yii::app()->request->getParam('version', NULL);
-        $deviceId           = Yii::app()->request->getParam('deviceId', NULL);
-        $platform           = Yii::app()->request->getParam('platform', NULL);
-        $channel            = Yii::app()->request->getParam('channel', NULL);
-        $appVersion         = Yii::app()->request->getParam('appVersion', NULL);
-        $osVersion          = Yii::app()->request->getParam('osVersion', NULL);
-        $appId              = Yii::app()->request->getParam('appId', NULL);
-
         if(!ctype_digit($userId)) {
             $this->_return('MSG_ERR_FAIL_USER');
         }
@@ -121,16 +97,15 @@ class CommonController extends ApiPublicController
 
     public function actionGetCommonInfo()
     {
-        $version            = Yii::app()->request->getParam('version', NULL);
-        $deviceId           = Yii::app()->request->getParam('deviceId', NULL);
-        $platform           = Yii::app()->request->getParam('platform', NULL);
-        $channel            = Yii::app()->request->getParam('channel', NULL);
-        $appVersion         = Yii::app()->request->getParam('appVersion', NULL);
-        $osVersion          = Yii::app()->request->getParam('osVersion', NULL);
-        $appId              = Yii::app()->request->getParam('appId', NULL);
+        $data = array();
 
-        $data['ads']              = ComAds::model()->getAds();
-        $data['version']         = ComChannel::model()->getAppVersion();
+        $data['ads'] = ComAds::model()->getAds();
+        $version = ComChannel::model()->getAppVersion();
+
+        // print_r($version); exit;
+        $data['lastVersion'] = $version['lastVersion'];
+        $data['updateVersion'] = $version['updateVersion'];
+        $data['downloadUrl'] = $version['downloadUrl'];
 
         $this->_return('MSG_SUCCESS', $data);
     }

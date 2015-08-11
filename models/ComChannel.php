@@ -17,26 +17,31 @@ class ComChannel extends CActiveRecord
         $data = array();
         $table_name = $this->tableName();
         try {
+            $channel = Yii::app()->request->getParam('channel', NULL);
             $result = Yii::app()->cnhutong_user->createCommand()
-                ->select('id, last_version, new_version, download')
-                ->from($table_name) 
-//                 ->where('member_id=:MemberId and department_id=:DepartmentId and type=2',
-//                 		array(':MemberId' => $adminId, ':DepartmentId' => $departmentId))
-                // ->queryRow();
-                ->queryAll();
-            
-            // 判断数据是否为空数组
-            if(ApiPublicController::array_is_null($result)) {
-                $data[] = [];
+                ->select('last_version, new_version, download')
+                ->from($table_name)
+                ->where('id=:ID', array(':ID' => $channel))
+                ->queryRow();
+            if ($result == NULL) {
+                // 获取官方渠道版本和更新地址
+                if ($this->_PLATFROM == 1) {
+                    // IOS
+                    $channel = Yii::app()->params['channel_cnhutong_ios'];
+                } else if ($this->_PLATFORM == 2) {
+                    // Android
+                    $channel = Yii::app()->params['channel_cnhutong_android'];
+                }
+                $result = Yii::app()->cnhutong_user->createCommand()
+                    ->select('last_version, new_version, download')
+                    ->from($table_name)
+                    ->where('id=:ID', array(':ID' => $channel))
+                    ->queryRow();
             }
 
-            foreach($result as $row) {
-                $version = array();
-                $version['lastVersion']               = $row['last_version'];
-                $version['updateVersion']             = $row['new_version'];
-                $version['downloadUrl']               = $row['download'];
-                $data[] = $version;
-            }
+            $data['lastVersion'] = $result['last_version'];
+            $data['updateVersion'] = $result['new_version'];
+            $data['downloadUrl'] = $result['download'];
         } catch (Exception $e) {
             error_log($e);
         }
