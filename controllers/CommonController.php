@@ -16,9 +16,9 @@ class CommonController extends ApiPublicController
         $userId = Yii::app()->request->getParam('userId', NULL);
 
         $data = ComDepartment::model()->getAllSchools();
-        if(!$data) {
-            $this->_return('MSG_ERR_UNKOWN');
-        }
+        
+        // TODO : add log
+        
         $this->_return('MSG_SUCCESS', $data);
     }
 
@@ -46,7 +46,10 @@ class CommonController extends ApiPublicController
         if(!$school) {
             $this->_return('MSG_ERR_FAIL_DEPARTMENT');
         }
-        $data['school'] = $school;
+        $data['id'] = $school['id'];
+        $data['name'] = $school['name'];
+        $data['busLine'] = $school['bus_line'];
+        $data['parking'] = $school['parking'];
         $pictures = ComDepartmentPicture::model()->getSchoolInfoPicture($departmentId);
         if(!$pictures) {
             $data['pictures'] = [''];
