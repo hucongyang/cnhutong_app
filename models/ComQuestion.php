@@ -81,7 +81,8 @@ class ComQuestion extends CActiveRecord
                 $questions['answerB']                 = $row['answer_b'];
                 $questions['answerC']                 = $row['answer_c'];
                 $questions['answerD']                 = $row['answer_d'];
-                $data[] = $questions;
+                $question_filter                        = array_filter($questions);
+                $data['questions'][] = $question_filter;
             }
 
         } catch (Exception $e) {

@@ -94,8 +94,11 @@ class CommonController extends ApiPublicController
         }
 
         $data = ComAppointment::model()->postAppointment($userId, $name, $mobile, $subject);
+        if(!$data) {
+        	$this->_return('MSG_ERR_UNKOWN');
+        }
 
-        $this->_return('MSG_SUCCESS', $data);
+        $this->_return('MSG_SUCCESS');
     }
 
     public function actionGetCommonInfo()

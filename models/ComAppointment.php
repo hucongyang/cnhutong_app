@@ -22,7 +22,7 @@ class ComAppointment extends CActiveRecord
      */
     public function postAppointment($userId, $name, $mobile, $subject)
     {
-        $result =  0;
+        $result = 0;
         try {
             $result = Yii::app()->cnhutong_user->createCommand()
                 ->insert('com_appointment',
