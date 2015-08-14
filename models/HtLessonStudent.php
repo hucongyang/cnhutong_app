@@ -80,7 +80,7 @@ class HtLessonStudent extends CActiveRecord
                 $lesson['departmentId']                      = $row['departmentId'];
                 $departmentInfo = ApiPublicLesson::model()->getDepartmentInfoById($lesson['departmentId']);
                 $lesson['departmentName']                    = $departmentInfo['name'] . '分院';
-                $data[] = $lesson;
+                $data['subjects'][] = $lesson;
             }
 
 //            $data = $result;
@@ -156,7 +156,7 @@ class HtLessonStudent extends CActiveRecord
                 $subject['departmentId']                      = $row['department_id'];
                 $departmentInfo = ApiPublicLesson::model()->getDepartmentInfoById($subject['departmentId']);
                 $subject['departmentName']                    = $departmentInfo['name'] . '分院';
-                $data[] = $subject;
+                $data['subjects'][] = $subject;
             }
 
 //            $data = $result;
@@ -227,7 +227,7 @@ class HtLessonStudent extends CActiveRecord
                 $lessons['lessonStatus']                        = self::getLessonStatusNow($row['step']);
                 $lessons['lessonCharge']                        = $row['student_comment'];
 
-                $data[] = $lessons;
+                $data['lessons'][] = $lessons;
             }
 //            $data = $result;
         } catch (Exception $e) {
@@ -298,11 +298,25 @@ class HtLessonStudent extends CActiveRecord
                 $lessonDetail['lessonStatus']                   = self::getLessonStatusNow($row['step']);
                 $lessonDetail['teacherId']                      = $row['teacherId'];
                 $lessonDetail['teacherName']                    = ApiPublicLesson::model()->getNameByMemberId($row['teacherId']);
-                $lessonDetail['lessonScore']                    = $row['student_rating'];
-                if(empty($lessonDetail['lessonScore'])) {
-                    $lessonDetail['lessonScore']    = '';
-                }
-                $lessonDetail['lessonCharge']                   = $row['student_comment'];
+//                $lessonDetail['lessonScore']                    = $row['student_rating'];
+
+                $eval = Yii::app()->cnhutong_user->createCommand()
+                    ->select('teach_attitude, teach_content, teach_environment, statement')
+                    ->from('lesson_student_eval')
+                    ->where('member_id = :memberId And lesson_student_id = :lessonStudentId',
+                        array(
+                            ':memberId' => $memberId,
+                            ':lessonStudentId' => $lessonStudentId
+                        )
+                    )
+                    ->queryRow();
+
+                $lessonDetail['teachAttitude'] = isset( $eval['teach_attitude'] ) ? $eval['teach_attitude'] : '';
+                $lessonDetail['teachContent'] = isset( $eval['teach_content'] ) ? $eval['teach_content'] : '';
+                $lessonDetail['teachEnvironment'] = isset( $eval['teach_environment'] ) ? $eval['teach_environment'] : '';
+                $lessonDetail['lessonCharge'] = isset( $eval['statement'] ) ? $eval['statement'] : '';
+
+//                $lessonDetail['lessonCharge']                   = $row['student_comment'];
                 $lessonDetail['lessonContent']                  = $row['lesson_content'];
                 if(empty($lessonDetail['lessonContent'])) {
                     $lessonDetail['lessonContent']    = '';
@@ -324,12 +338,15 @@ class HtLessonStudent extends CActiveRecord
      * @param $token                    -- 用户验证token
      * @param $memberId                 -- 用户当前绑定的学员对对应的ID
      * @param $lessonStudentId          -- 课时唯一编号
-     * @param $score                    -- 学员给课时的评分，1-5分
+     * @param teachAttitude                 -- 学员给教学态度的评分，1-5分
+     * @param teachContent                  -- 学员给教学内容的评分，1-5分
+     * @param teachEnvironment              -- 学员给教学环境的评分，1-5分
      * @param $stateComment             -- 课时评价，可以为空
      * @return array|int
      */
-    public function lessonStudent($userId, $token, $memberId, $lessonStudentId, $score, $stateComment)
+    public function lessonStudent($userId, $token, $memberId, $lessonStudentId, $teachAttitude, $teachContent, $teachEnvironment, $stateComment)
     {
+        $nowTime = date("Y-m-d H-i-s");              //当前时间
         $data = array();
         try {
             // 用户ID验证
@@ -354,10 +371,30 @@ class HtLessonStudent extends CActiveRecord
                 return 20021;
             }
 
-            if($score < 0 || $score > 5) {
+            if( ($teachAttitude < 0 || $teachAttitude > 5) || ($teachContent < 0 || $teachContent > 5) || ($teachEnvironment < 0 || $teachEnvironment > 5) ) {
                 return 20022;
             }
 
+            $issetEval = self::IssetEval($memberId, $lessonStudentId);
+            if($issetEval) {
+                return 20024;
+            }
+
+            // insert 学生对课程评分和评价
+            $eval = Yii::app()->cnhutong_user->createCommand()
+                ->insert('lesson_student_eval',
+                    array(
+                        'member_id' => $memberId,
+                        'lesson_student_id' => $lessonStudentId,
+                        'teach_attitude' => $teachAttitude,
+                        'teach_content' => $teachContent,
+                        'teach_environment' => $teachEnvironment,
+                        'statement' => $stateComment,
+                        'create_ts' => $nowTime
+                    )
+                );
+            // 连接 CMS 数据库系统, 更新课时评价数据
+            $score = $teachAttitude + $teachContent + $teachEnvironment;        // cms系统评分为教学三项评分总和
             $result = Yii::app()->cnhutong->createCommand()
                 ->update('ht_lesson_student',
                     array(
@@ -370,10 +407,6 @@ class HtLessonStudent extends CActiveRecord
                         ':id' => $lessonStudentId
                     )
                 );
-
-            if(empty($result)) {
-                $data[] = [];
-            }
 
 //            $data = $result;
         } catch (Exception $e) {
@@ -445,6 +478,8 @@ class HtLessonStudent extends CActiveRecord
                 return "已上未平";
             case "2":
                 return "已上已评";
+            case "3":
+                return "请假";
             default:
                 return '';
         }
@@ -492,6 +527,34 @@ class HtLessonStudent extends CActiveRecord
                 ->select('id')
                 ->from('ht_lesson_student')
                 ->where('student_id = :memberId And id = :lessonStudentId',
+                    array(
+                        ':memberId' => $memberId,
+                        ':lessonStudentId' => $lessonStudentId
+                    )
+                )
+                ->queryScalar();
+        } catch (Exception $e) {
+            error_log($e);
+        }
+        return $id;
+    }
+
+    /**
+     * 判断该学员该课时是否已评价，如已评则不在让评价
+     * 输入：memberId 学员特有ID；lessonStudentId 课时ID
+     * 输出：课时是否评价
+     * @param $memberId
+     * @param $lessonStudentId
+     * @return string
+     */
+    public function IssetEval($memberId, $lessonStudentId)
+    {
+        $id = '';
+        try {
+            $id = Yii::app()->cnhutong_user->createCommand()
+                ->select('id')
+                ->from('lesson_student_eval')
+                ->where('member_id = :memberId And lesson_student_id = :lessonStudentId',
                     array(
                         ':memberId' => $memberId,
                         ':lessonStudentId' => $lessonStudentId

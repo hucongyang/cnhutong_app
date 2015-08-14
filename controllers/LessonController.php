@@ -161,7 +161,9 @@ class LessonController extends ApiPublicController
      * @param token         -- 用户验证token
      * @param memberId      -- 用户当前绑定的学员所对应的ID
      * @param lessonStudentId  -- 课程的唯一排课编号
-     * @param score             -- 学员给课时的评分，0-5分
+     * @param teachAttitude                 -- 学员给教学态度的评分，1-5分
+     * @param teachContent                  -- 学员给教学内容的评分，1-5分
+     * @param teachEnvironment              -- 学员给教学环境的评分，1-5分
      * @param statement         -- 学员给课时的评价
      * @return result          调用返回结果
      * @return msg             调用返回结果说明
@@ -172,7 +174,8 @@ class LessonController extends ApiPublicController
         // 检查参数
         if(!isset($_REQUEST['userId']) || !isset($_REQUEST['token'])
             || !isset($_REQUEST['memberId']) || !isset($_REQUEST['lessonStudentId'])
-            || !isset($_REQUEST['score']) || !isset($_REQUEST['statement']))
+            || !isset($_REQUEST['teachAttitude']) || !isset($_REQUEST['teachContent'])
+            || !isset($_REQUEST['teachEnvironment']) || !isset($_REQUEST['statement']))
         {
             $this->_return('MSG_ERR_LESS_PARAM');
         }
@@ -181,10 +184,12 @@ class LessonController extends ApiPublicController
         $token = Yii::app()->request->getParam('token', NULL);
         $memberId = Yii::app()->request->getParam('memberId', NULL);
         $lessonStudentId = Yii::app()->request->getParam('lessonStudentId', NULL);
-        $score = Yii::app()->request->getParam('score', NUll);
+        $teachAttitude = Yii::app()->request->getParam('teachAttitude', NUll);
+        $teachContent = Yii::app()->request->getParam('teachContent', NUll);
+        $teachEnvironment = Yii::app()->request->getParam('teachEnvironment', NUll);
         $stateComment = Yii::app()->request->getParam('statement', NUll);
 
-        $data = HtLessonStudent::model()->lessonStudent($userId, $token, $memberId, $lessonStudentId, $score, $stateComment);
+        $data = HtLessonStudent::model()->lessonStudent($userId, $token, $memberId, $lessonStudentId, $teachAttitude, $teachContent, $teachEnvironment, $stateComment);
         if($data === 20008) {
             $this->_return('MSG_ERR_FAIL_USER');
         } elseif ($data === 20007) {
@@ -195,6 +200,8 @@ class LessonController extends ApiPublicController
             $this->_return('MSG_ERR_LESSON_STUDENT_ID');
         } elseif ($data === 20022) {
             $this->_return('MSG_ERR_SCORE');
+        } elseif ($data === 20024) {
+            $this->_return('MSG_ERR_INVALID_EVAL');
         }
         // 记录log
 

@@ -57,6 +57,8 @@ $_error_code = array(
 
         'MSG_ERR_QUESTION'                  => array('20023', '题目顺序错误'),
 
+        'MSG_ERR_INVALID_EVAL'                  => array('20024', '该学员ID对应该课时ID已评价'),
+
 		// 其它
 		'MSG_ERR_UNKOWN'			=> array('99999', '未知错误')
 );
