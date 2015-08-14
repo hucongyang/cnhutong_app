@@ -67,7 +67,7 @@ class UserMember extends CActiveRecord
             }
             // 验证学员ID数量，目前最多绑定3个
             $countMemberId = self::getBindMemberNum($userId);
-            if($countMemberId <=0 || $countMemberId >= 3) {
+            if($countMemberId >= 3) {
                 return 20013;
             }
             //口令salt 不能为空
