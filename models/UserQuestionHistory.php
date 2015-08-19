@@ -54,7 +54,7 @@ class UserQuestionHistory extends CActiveRecord
                 $subjectInfo                          = ApiPublicLesson::model()->getSubjectInfoById($row['subject']);
                 $subjects['subjectName']            = $subjectInfo['title'];
                 $subjects['testUsers']              = $row['testUsers'];
-                $data['subject'][] = $subjects;
+                $data['subjects'][] = $subjects;
             }
 
         } catch (Exception $e) {

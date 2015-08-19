@@ -15,6 +15,14 @@ class CommonController extends ApiPublicController
         // 非必须
         $userId = Yii::app()->request->getParam('userId', NULL);
 
+
+        $deviceId           = Yii::app()->request->getParam('deviceId', NULL);
+        $platform           = Yii::app()->request->getParam('platform', NULL);
+        $channel            = Yii::app()->request->getParam('channel', NULL);
+        $appVersion         = Yii::app()->request->getParam('appVersion', NULL);
+        $osVersion          = Yii::app()->request->getParam('osVersion', NULL);
+        $appId              = Yii::app()->request->getParam('appId', NULL);
+
         $data = ComDepartment::model()->getAllSchools();
         
         // TODO : add log
@@ -42,7 +50,15 @@ class CommonController extends ApiPublicController
         $departmentId = Yii::app()->request->getParam('departmentId', NULL);
 
         $data = array();
-        $school = ComDepartment::model()->getSchoolInfo($departmentId);
+
+
+        $version            = Yii::app()->request->getParam('version', NULL);
+        $deviceId           = Yii::app()->request->getParam('deviceId', NULL);
+        $platform           = Yii::app()->request->getParam('platform', NULL);
+        $channel            = Yii::app()->request->getParam('channel', NULL);
+        $appVersion         = Yii::app()->request->getParam('appVersion', NULL);
+        $osVersion          = Yii::app()->request->getParam('osVersion', NULL);
+        $appId              = Yii::app()->request->getParam('appId', NULL);  $school = ComDepartment::model()->getSchoolInfo($departmentId);
         if(!$school) {
             $this->_return('MSG_ERR_FAIL_DEPARTMENT');
         }
@@ -101,6 +117,12 @@ class CommonController extends ApiPublicController
         $this->_return('MSG_SUCCESS');
     }
 
+    /**
+     * 用户在APP启动时获取APP所对应最新的版本号及广告信息
+     * @return result          调用返回结果
+     * @return msg             调用返回结果说明
+     * @return data             调用返回数据
+     */
     public function actionGetCommonInfo()
     {
         $data = array();
@@ -114,5 +136,38 @@ class CommonController extends ApiPublicController
         $data['downloadUrl'] = $version['downloadUrl'];
 
         $this->_return('MSG_SUCCESS', $data);
+    }
+
+    /**
+     * 用户在App中提交反馈意见等相关信息
+     * @return result          调用返回结果
+     * @return msg             调用返回结果说明
+     * @return data             调用返回数据
+     */
+    public function actionPostFeedback()
+    {
+        if(!isset($_REQUEST['userId']) || !isset($_REQUEST['feedback'])) {
+            $this->_return('MSG_ERR_LESS_PARAM');
+        }
+
+        $userId             = Yii::app()->request->getParam('userId', NULL);
+        $feedback           = Yii::app()->request->getParam('feedback', NULL);
+
+        if(!ctype_digit($userId)) {
+            $this->_return('MSG_ERR_FAIL_USER');
+        }
+
+        $encode = 'UTF-8';
+        $str_num = mb_strlen($feedback, $encode);
+        if( $str_num <= 0 || $str_num > 200 ) {
+            $this->_return('MSG_ERR_FEEDBACK');
+        }
+
+        $data = ComFeedback::model()->postFeedback($userId, $feedback);
+        if(!$data) {
+            $this->_return('MSG_ERR_UNKOWN');
+        }
+
+        $this->_return('MSG_SUCCESS');
     }
 }

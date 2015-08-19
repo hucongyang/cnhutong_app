@@ -59,6 +59,14 @@ $_error_code = array(
 
         'MSG_ERR_INVALID_EVAL'                  => array('20024', '该学员ID对应该课时ID已评价'),
 
+        'MSG_ERR_FEEDBACK'                  => array('20025', '反馈内容字数不在范围内(1-200字以内)'),
+
+        'MSG_ERR_INVALID_SIGN'             => array('20026', '今日已签到'),
+
+        'MSG_ERR_INVALID_PRIZE'             => array('20027', '连续签到7天才可抽奖'),
+
+        'MSG_ERR_SIGN_TYPE'             => array('20028', '签到类型错误'),
+
 		// 其它
 		'MSG_ERR_UNKOWN'			=> array('99999', '未知错误')
 );

@@ -46,7 +46,7 @@ class ComQuestion extends CActiveRecord
                 ->from('com_question')
                 ->where('subject = :subject', array(':subject' => $subject))
                 ->order('rand()')
-                ->limit('10')
+                ->limit('5')
                 ->queryAll();
 
             $question_id = '';

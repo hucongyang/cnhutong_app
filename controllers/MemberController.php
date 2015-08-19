@@ -255,7 +255,7 @@ class MemberController extends ApiPublicController
 
     /**
      * 用户解除绑定学员信息      actionRemoveMember()
-     * @salt $memberId string       --绑定学员对应ID
+     * @memberId $memberId string       --绑定学员对应ID
      * @token  $token  string       --登录token
      * @userId  $userId int         --用户id(APP中用户的唯一标识)
      * @return result          调用返回结果
@@ -289,11 +289,11 @@ class MemberController extends ApiPublicController
     /**
      * 登录接口 actionLogin()  手机号码，密码登录
      *
-     * @param $mobile string 注册时使用的手机号
-     * @param $password string 注册时密码
-     * @return $result          调用返回结果
-     * @return $msg             调用返回结果说明
-     * @return $data             调用返回数据
+     * @mobile $mobile string           --注册时使用的手机号
+     * @password $password string       --注册时密码
+     * @return result          调用返回结果
+     * @return msg             调用返回结果说明
+     * @return data             调用返回数据
      */
     public function actionLogin()
     {
@@ -327,11 +327,11 @@ class MemberController extends ApiPublicController
     /**
      * 用户自动登录接口 actionUserVerify()  登录token(在系统中存放30天有效);用户id
      *
-     * @param $token string 登录token
-     * @param $userId int 用户id
-     * @return $result          调用返回结果
-     * @return $msg             调用返回结果说明
-     * @return $data             调用返回数据
+     * @token $token string     --登录token
+     * @userId $userId int      --用户id
+     * @return result          调用返回结果
+     * @return msg             调用返回结果说明
+     * @return data             调用返回数据
      */
     public function actionUserVerify()
     {
@@ -368,12 +368,12 @@ class MemberController extends ApiPublicController
     /**
      * 用户重置密码 actionResetPassword()
      *
-     * @param $mobile string 注册用手机号
-     * @param $password string 密码(MD5加密)
-     * @param $checkNum string 服务器验证码
-     * @return $result          调用返回结果
-     * @return $msg             调用返回结果说明
-     * @return $data             调用返回数据
+     * @mobile $mobile string           --注册用手机号
+     * @password $password string       --密码(MD5加密)
+     * @checkNum $checkNum string       --服务器验证码
+     * @return result          调用返回结果
+     * @return msg             调用返回结果说明
+     * @return data             调用返回数据
      */
     public function actionResetPassword()
     {
@@ -403,6 +403,119 @@ class MemberController extends ApiPublicController
         }
 
         // 记录log
+
+        $this->_return('MSG_SUCCESS', $data);
+    }
+
+    /**
+     * 用户在app中获取用户积分等相关信息
+     *
+     * @token $token string     --登录token
+     * @userId $userId int      --用户id
+     * @return result          调用返回结果
+     * @return msg             调用返回结果说明
+     * @return data             调用返回数据
+     */
+    public function actionGetPointInfo()
+    {
+        if(!isset($_REQUEST['token']) || !isset($_REQUEST['userId'])) {
+            $this->_return('MSG_ERR_LESS_PARAM');
+        }
+
+        $token = Yii::app()->request->getParam('token', NULL);
+        $userId = Yii::app()->request->getParam('userId', NULL);
+
+        if(!ctype_digit($userId)) {
+            $this->_return('MSG_ERR_FAIL_USER');
+        }
+
+        // 用户user/token验证
+        $userToken = UserToken::model()->IsToken($userId, $token);
+        if(!$userToken) {
+            $this->_return('MSG_ERR_FAIL_TOKEN');       // MSG_ERR_FAIL_TOKEN
+        }
+
+        $data = UserScoreHistory::model()->pointInfo($userId);
+
+        $this->_return('MSG_SUCCESS', $data);
+    }
+
+    /**
+     * 用户在app中进行签到，以获取相关积分
+     *
+     * @token $token string     --登录token
+     * @userId $userId int      --用户id
+     * @signType $signType int  -- 签到类型signType
+     * @return result          调用返回结果
+     * @return msg             调用返回结果说明
+     * @return data             调用返回数据
+     */
+    public function actionUserDailySign()
+    {
+        if(!isset($_REQUEST['token']) || !isset($_REQUEST['userId']) || !isset($_REQUEST['signType'])) {
+            $this->_return('MSG_ERR_LESS_PARAM');
+        }
+
+        $token = Yii::app()->request->getParam('token', NULL);
+        $userId = Yii::app()->request->getParam('userId', NULL);
+        $signType = Yii::app()->request->getParam('signType', NULL);
+
+        if(!ctype_digit($userId)) {
+            $this->_return('MSG_ERR_FAIL_USER');
+        }
+
+        // 用户user/token验证
+        $userToken = UserToken::model()->IsToken($userId, $token);
+        if(!$userToken) {
+            $this->_return('MSG_ERR_FAIL_TOKEN');       // MSG_ERR_FAIL_TOKEN
+        }
+
+        $aType = array('1', '2');
+        if(!in_array($signType, $aType)) {
+            $this->_return('MSG_ERR_SIGN_TYPE');
+        }
+
+        $data = UserDailySign::model()->dailySign($userId, $signType);
+        if ($data === 20026) {
+            $this->_return('MSG_ERR_INVALID_SIGN');
+        }
+
+        $this->_return('MSG_SUCCESS', $data);
+    }
+
+    /**
+     * 用户在app中进行签到抽奖，以获取相关积分
+     *
+     * @token $token string     --登录token
+     * @userId $userId int      --用户id
+     * @return result          调用返回结果
+     * @return msg             调用返回结果说明
+     * @return data             调用返回数据
+     */
+    public function actionUserPrizeSign()
+    {
+        if(!isset($_REQUEST['token']) || !isset($_REQUEST['userId'])) {
+            $this->_return('MSG_ERR_LESS_PARAM');
+        }
+
+        $token = Yii::app()->request->getParam('token', NULL);
+        $userId = Yii::app()->request->getParam('userId', NULL);
+
+        if(!ctype_digit($userId)) {
+            $this->_return('MSG_ERR_FAIL_USER');
+        }
+
+        // 用户user/token验证
+        $userToken = UserToken::model()->IsToken($userId, $token);
+        if(!$userToken) {
+            $this->_return('MSG_ERR_FAIL_TOKEN');       // MSG_ERR_FAIL_TOKEN
+        }
+
+        $data = UserDailySign::model()->prizeSign($userId, $token);
+//        var_dump($data);exit;
+        if ($data === 20027) {
+            $this->_return('MSG_ERR_INVALID_PRIZE');
+        }
 
         $this->_return('MSG_SUCCESS', $data);
     }
