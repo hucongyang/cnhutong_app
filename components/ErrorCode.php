@@ -41,9 +41,9 @@ $_error_code = array(
 
         'MSG_ERR_SALT'                  => array('20015', '口令错误'),
 
-        'MSG_ERR_INVALID_SALT'        => array('20016', '口令已被使用，失效'),
+        'MSG_ERR_INVALID_MEMBER'        => array('20016', '学员memberId已绑定'),
 
-        'MSG_ERR_FAIL_MEMBER'         => array('20017', '传入的学员MEMBER_ID错误'),
+        'MSG_ERR_FAIL_MEMBER'         => array('20017', '传入的学员memberId错误'),
 
         'MSG_ERR_NULL_SALT'                  => array('20018', '口令为NULL'),
 
@@ -61,11 +61,15 @@ $_error_code = array(
 
         'MSG_ERR_FEEDBACK'                  => array('20025', '反馈内容字数不在范围内(1-200字以内)'),
 
-        'MSG_ERR_INVALID_SIGN'             => array('20026', '今日已签到'),
+        'MSG_ERR_INVALID_SIGN'             => array('20026', '今日已签到 '),
 
         'MSG_ERR_INVALID_PRIZE'             => array('20027', '连续签到7天才可抽奖'),
 
         'MSG_ERR_SIGN_TYPE'             => array('20028', '签到类型错误'),
+
+        'MSG_ERR_HISTORY_ID'             => array('20029', '积分历史ID错误'),
+
+        'MSG_ERR_NULL_HISTORY'             => array('20030', '没有积分历史'),
 
 		// 其它
 		'MSG_ERR_UNKOWN'			=> array('99999', '未知错误')

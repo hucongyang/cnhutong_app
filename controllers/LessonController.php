@@ -3,9 +3,8 @@
 class LessonController extends ApiPublicController
 {
     /**
-     * 获取学员所有正在进行课程的下一次上课时间 actionGetNextLessonList()
-     *
-     * 获取学员所有正在进行课程的下一次上课时间
+     * action_id : 2301
+     * 获取学员所有正在进行课程的下一次上课时间 actionGetNextLessonList(),获取课程提醒
      * @userId $userId       -- 用户ID
      * @token $token        -- 用户验证token
      * @memberId $memberId     -- 用户当前绑定的学员所对应的ID
@@ -35,17 +34,23 @@ class LessonController extends ApiPublicController
             $this->_return('MSG_ERR_FAIL_MEMBER');
         }
 
-        // 记录log
+        // TODO : add log
+        $actionId = 2301;
+        $params = '';
+        foreach($_REQUEST as $key => $value) {
+            $params .= $key . '=' . $value . '&';
+        }
+        LogUserAction::model()->userAction($userId, $actionId, $params);
 
         $this->_return('MSG_SUCCESS', $data);
     }
 
     /**
-     * 获取学员所有的课程，包括正在学习的课程和历史课程  actionGetAllSubjects()
-     *
-     * @param $userId       -- 用户ID
-     * @param $token        -- 用户验证token
-     * @param $memberId     -- 用户当前绑定的学员所对应的ID
+     * action_id : 2302
+     * 获取学员所有课程，包括正在学习的课程和历史课程  actionGetAllSubjects()
+     * @userId $userId       -- 用户ID
+     * @token $token        -- 用户验证token
+     * @memberId $memberId     -- 用户当前绑定的学员所对应的ID
      * @return result          调用返回结果
      * @return msg             调用返回结果说明
      * @return data             调用返回数据
@@ -71,12 +76,19 @@ class LessonController extends ApiPublicController
             $this->_return('MSG_ERR_FAIL_MEMBER');
         }
 
-        // 记录log
+        // TODO : add log
+        $actionId = 2302;
+        $params = '';
+        foreach($_REQUEST as $key => $value) {
+            $params .= $key . '=' . $value . '&';
+        }
+        LogUserAction::model()->userAction($userId, $actionId, $params);
 
         $this->_return('MSG_SUCCESS', $data);
     }
 
     /**
+     * action_id : 2303
      * 获取学员指定课程的具体课时详情(课程表)
      * @param userId        -- 用户ID
      * @param token         -- 用户验证token
@@ -111,13 +123,20 @@ class LessonController extends ApiPublicController
             $this->_return('MSG_ERR_LESSON_ARRANGE_ID');
         }
 
-        // 记录log
+        // TODO : add log
+        $actionId = 2303;
+        $params = '';
+        foreach($_REQUEST as $key => $value) {
+            $params .= $key . '=' . $value . '&';
+        }
+        LogUserAction::model()->userAction($userId, $actionId, $params);
 
         $this->_return('MSG_SUCCESS', $data);
     }
 
     /**
-     * 获取学员指定课程的具体课时详情(课程表)
+     * action_id : 2304
+     * 获取学员指定课时的具体详情
      * @param userId        -- 用户ID
      * @param token         -- 用户验证token
      * @param memberId      -- 用户当前绑定的学员所对应的ID
@@ -150,12 +169,20 @@ class LessonController extends ApiPublicController
         } elseif ($data === 20021) {
             $this->_return('MSG_ERR_LESSON_STUDENT_ID');
         }
-        // 记录log
+
+        // TODO : add log
+        $actionId = 2304;
+        $params = '';
+        foreach($_REQUEST as $key => $value) {
+            $params .= $key . '=' . $value . '&';
+        }
+        LogUserAction::model()->userAction($userId, $actionId, $params);
 
         $this->_return('MSG_SUCCESS', $data);
     }
 
     /**
+     * action_id : 2305
      * 学员对上过的课时进行评价和打分
      * @param userId        -- 用户ID
      * @param token         -- 用户验证token
@@ -203,12 +230,20 @@ class LessonController extends ApiPublicController
         } elseif ($data === 20024) {
             $this->_return('MSG_ERR_INVALID_EVAL');
         }
-        // 记录log
+
+        // TODO : add log
+        $actionId = 2305;
+        $params = '';
+        foreach($_REQUEST as $key => $value) {
+            $params .= $key . '=' . $value . '&';
+        }
+        LogUserAction::model()->userAction($userId, $actionId, $params);
 
         $this->_return('MSG_SUCCESS', $data);
     }
 
     /**
+     * action_id : 2306
      * 学员在APP中对自己的课时进行请假或者取消请假的操作
      * @param userId        -- 用户ID
      * @param token         -- 用户验证token
@@ -243,7 +278,14 @@ class LessonController extends ApiPublicController
         } elseif ($data === 20007) {
             $this->_return('MSG_ERR_FAIL_TOKEN');
         }
-        // 记录log
+
+        // TODO : add log
+        $actionId = 2306;
+        $params = '';
+        foreach($_REQUEST as $key => $value) {
+            $params .= $key . '=' . $value . '&';
+        }
+        LogUserAction::model()->userAction($userId, $actionId, $params);
 
         $this->_return('MSG_SUCCESS', $data);
     }

@@ -4,6 +4,7 @@ class CommonController extends ApiPublicController
 {
 
     /**
+     * action_id : 2204
      * 获取校区列表               getAllSchools
      * @userId  $userId int         -- 用户ID
      * @return result          调用返回结果
@@ -26,11 +27,18 @@ class CommonController extends ApiPublicController
         $data = ComDepartment::model()->getAllSchools();
         
         // TODO : add log
+        $actionId = 2204;
+        $params = '';
+        foreach($_REQUEST as $key => $value) {
+            $params .= $key . '=' . $value . '&';
+        }
+        LogUserAction::model()->userAction($userId, $actionId, $params);
         
         $this->_return('MSG_SUCCESS', $data);
     }
 
     /**
+     * action_id : 2205
      * 获取校区详细列表      getSchoolInfo()
      * @userId userId int 用户id          --非必填
      * @departmentId departmentId int    --校区对应ID 必填
@@ -50,7 +58,6 @@ class CommonController extends ApiPublicController
         $departmentId = Yii::app()->request->getParam('departmentId', NULL);
 
         $data = array();
-
 
         $version            = Yii::app()->request->getParam('version', NULL);
         $deviceId           = Yii::app()->request->getParam('deviceId', NULL);
@@ -72,11 +79,21 @@ class CommonController extends ApiPublicController
 //            $this->_return('MSG_ERR_FAIL_DEPARTMENT');
         }
         $data['pictures'] = $pictures;
+
+        // TODO : add log
+        $actionId = 2205;
+        $params = '';
+        foreach($_REQUEST as $key => $value) {
+            $params .= $key . '=' . $value . '&';
+        }
+        LogUserAction::model()->userAction($userId, $actionId, $params);
+
         $this->_return('MSG_SUCCESS', $data);
     }
 
     /**
-     * 用户在APP中提交试听等相关的信息
+     * action_id : 2202
+     * 用户在APP中提交试听等相关的信息,提交线索
      * @userId $userId
      * @name $name
      * @mobile $mobile
@@ -114,11 +131,20 @@ class CommonController extends ApiPublicController
         	$this->_return('MSG_ERR_UNKOWN');
         }
 
+        // TODO : add log
+        $actionId = 2202;
+        $params = '';
+        foreach($_REQUEST as $key => $value) {
+            $params .= $key . '=' . $value . '&';
+        }
+        LogUserAction::model()->userAction($userId, $actionId, $params);
+
         $this->_return('MSG_SUCCESS');
     }
 
     /**
-     * 用户在APP启动时获取APP所对应最新的版本号及广告信息
+     * action_id : 2201
+     * 用户在APP启动时获取APP所对应最新的版本号及广告信息,广告及更新版本获取
      * @return result          调用返回结果
      * @return msg             调用返回结果说明
      * @return data             调用返回数据
@@ -135,11 +161,20 @@ class CommonController extends ApiPublicController
         $data['updateVersion'] = $version['updateVersion'];
         $data['downloadUrl'] = $version['downloadUrl'];
 
+        // TODO : add log
+        $actionId = 2201;
+        $params = '';
+        foreach($_REQUEST as $key => $value) {
+            $params .= $key . '=' . $value . '&';
+        }
+        LogUserAction::model()->userAction($userId = 0, $actionId, $params);
+
         $this->_return('MSG_SUCCESS', $data);
     }
 
     /**
-     * 用户在App中提交反馈意见等相关信息
+     * action_id : 2203
+     * 用户在App中提交反馈意见等相关信息,提交意见反馈
      * @return result          调用返回结果
      * @return msg             调用返回结果说明
      * @return data             调用返回数据
@@ -167,6 +202,14 @@ class CommonController extends ApiPublicController
         if(!$data) {
             $this->_return('MSG_ERR_UNKOWN');
         }
+
+        // TODO : add log
+        $actionId = 2203;
+        $params = '';
+        foreach($_REQUEST as $key => $value) {
+            $params .= $key . '=' . $value . '&';
+        }
+        LogUserAction::model()->userAction($userId, $actionId, $params);
 
         $this->_return('MSG_SUCCESS');
     }

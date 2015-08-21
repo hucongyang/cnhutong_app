@@ -46,11 +46,14 @@ class UserDailySign extends CActiveRecord
             if($signType == 1) {
                 $pointChange = 2;                   // 用户正常签到后获取的积分值
             } elseif ($signType == 2) {
-                $pointChange = rand(-2, 5);         // 用户随机签到后获得的积分值
+                $pointChange = rand(-1, 5);         // 用户随机签到后获得的积分值
             } else {
                 $pointChange = 0;
             }
 
+            if($pointChange >= 0) {
+                $pointChange = '+' . $pointChange;
+            }
 //            var_dump($signDays);exit;
             if(self::IssetUser($userId)) {
                 $prizeFlag = 0;
@@ -93,11 +96,7 @@ class UserDailySign extends CActiveRecord
             $scoreUpdate = UserScoreHistory::model()->updateUserScore($userId, $scoreRest);
 
             $data['point']  = UserScoreHistory::model()->getPoint($userId);
-            if($pointChange >= 0) {
-                $pointChange = '+' . $pointChange;
-            } else {
-                $pointChange = '-' . $pointChange;
-            }
+
             $data['pointChange']    = $pointChange;
             $sign = self::flag($userId);
             $data['signDays']   = $sign['signDays'];
@@ -227,23 +226,5 @@ class UserDailySign extends CActiveRecord
             error_log($e);
         }
         return $id;
-    }
-
-    /**
-     * 输入 状态 reason 0-1-2
-     * 输出 对应的积分变化原因 签到，抽奖等等
-     * @param $reason
-     * @return string
-     */
-    public function scoreChangeByReason($reason)
-    {
-        switch ($reason) {
-            case "1":
-                return "签到";
-            case "2":
-                return "抽奖";
-            default:
-                return "";
-        }
     }
 }

@@ -19,19 +19,70 @@ class UserScoreHistory extends CActiveRecord
     /**
      * 用户在App中获取用户积分等相关信息
      * @param $userId
-     * @param $token
      * @return array|int
      */
     public function pointInfo($userId)
     {
         $data = array();
-        $nowTime = date("Y-m-d H:i:s");
         try {
             $data['point'] = self::getPoint($userId);
             $flag = UserDailySign::model()->flag($userId);
             $data['signDays']   = $flag['signDays'];
             $data['signFlag']   = $flag['signFlag'];
             $data['prizeFlag']  = $flag['prizeFlag'];
+
+        } catch (Exception $e) {
+            error_log($e);
+        }
+        return $data;
+    }
+
+    /**
+     * 用户在app中获得积分历史
+     *
+     * @param $userId
+     * @param $historyId
+     * @return array
+     */
+    public function userPointHistory($userId, $historyId)
+    {
+        $data = array();
+        try {
+            $history = array();
+            if($historyId == 0) {
+                $history = Yii::app()->cnhutong_user->createCommand()
+                    ->select('id, reason, change, create_ts')
+                    ->from('user_score_history')
+                    ->where('user_id = :userId', array(':userId' => $userId))
+                    ->order('id desc')
+                    ->limit('10')
+                    ->queryAll();
+            } else {
+                $history = Yii::app()->cnhutong_user->createCommand()
+                    ->select('id, reason, change, create_ts')
+                    ->from('user_score_history')
+                    ->where('user_id = :userId And id > :historyId', array(':userId' => $userId, ':historyId' => $historyId))
+                    ->order('id desc')
+                    ->limit('10')
+                    ->queryAll();
+            }
+
+            if(!$history) {
+                return 20030;       // MSG_ERR_NULL_HISTORY
+            }
+
+            foreach( $history as $row ) {
+                $result = array();
+                $result['historyId']        = $row['id'];
+                $result['item']              = self::scoreChangeByReason($row['reason']);
+                if( $row['change'] >= 0 ) {
+                    $row['change'] = '+' . $row['change'];
+                }
+                $result['change']           = $row['change'];
+                $result['changeTs']         = $row['create_ts'];
+
+                $data['history'][] = $result;
+            }
 
         } catch (Exception $e) {
             error_log($e);
@@ -112,5 +163,23 @@ class UserScoreHistory extends CActiveRecord
             error_log($e);
         }
         return $result;
+    }
+
+    /**
+     * 输入 状态 reason 1-2
+     * 输出 对应的积分变化原因 签到，抽奖等等
+     * @param $reason
+     * @return string
+     */
+    public function scoreChangeByReason($reason)
+    {
+        switch ($reason) {
+            case "1":
+                return "签到";
+            case "2":
+                return "抽奖";
+            default:
+                return "";
+        }
     }
 }

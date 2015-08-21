@@ -79,11 +79,13 @@ class UserMember extends CActiveRecord
             if(!$memberId) {
                 return 20015;       // MSG_ERR_SALT
             }
-            // salt 口令是否已使用
+
+            // 验证要添加的memberId 是否存在
             $userMemberId = self::IsExistMemberId($userId, $memberId);
             if($userMemberId) {
-                return 20016;       // MSG_ERR_INVALID_SALT
+                return 20016;       // MSG_ERR_INVALID_MEMBER
             }
+
             // 验证通过后，insert数据
             $nowTime = date("Y-m-d", strtotime("now"));
             $user_member = Yii::app()->cnhutong_user->createCommand()
@@ -99,7 +101,7 @@ class UserMember extends CActiveRecord
             //members
             $data['members'] = self::getMembers($userId);
             if(!$data['members']) {
-                $data['members'] = "尚未绑定学员id";
+                $data['members'] = [];
             }
 
         } catch (Exception $e) {
@@ -150,7 +152,7 @@ class UserMember extends CActiveRecord
             //members
             $data['members'] = self::getMembers($userId);
             if(!$data['members']) {
-                $data['members'] = "尚未绑定学员id";
+                $data['members'] = [];
             }
 
         } catch (Exception $e) {
@@ -194,7 +196,7 @@ class UserMember extends CActiveRecord
             $id = Yii::app()->cnhutong_user->createCommand()
                 ->select('id')
                 ->from('user_member')
-                ->where('user_id = :userId And member_id = :memberId',
+                ->where('user_id = :userId And member_id = :memberId And status in (0,1)',
                     array(
                         ':userId' => $userId,
                         ':memberId' => $memberId

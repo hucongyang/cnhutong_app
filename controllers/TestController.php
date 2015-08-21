@@ -7,7 +7,8 @@
 class TestController extends ApiPublicController
 {
     /**
-     *在列表业内获取每个学科（类别）所进行过测试的人数
+     * action_id : 2401
+     * 在列表业内获取每个学科（类别）所进行过测试的人数
      * @userId $userId       -- 用户ID
      * @token $token        -- 用户验证token
      * @return result          调用返回结果
@@ -41,13 +42,20 @@ class TestController extends ApiPublicController
             $this->_return('MSG_ERR_FAIL_TOKEN');
         }
 
-        // 记录log
+        // TODO : add log
+        $actionId = 2401;
+        $params = '';
+        foreach($_REQUEST as $key => $value) {
+            $params .= $key . '=' . $value . '&';
+        }
+        LogUserAction::model()->userAction($userId, $actionId, $params);
 
         $this->_return('MSG_SUCCESS', $data);
     }
 
     /**
-     *用户获取试卷进行测试，获取10题 进行测试
+     * action_id : 2402
+     * 用户获取试卷进行测试，获取5题 进行测试
      * @userId $userId          -- 用户ID
      * @token $token            -- 用户验证token
      * @subject $subject        -- 对应测试类别
@@ -77,11 +85,28 @@ class TestController extends ApiPublicController
             $this->_return('MSG_ERR_FAIL_SUBJECT');
         }
 
-        // 记录log
+        // TODO : add log
+        $actionId = 2402;
+        $params = '';
+        foreach($_REQUEST as $key => $value) {
+            $params .= $key . '=' . $value . '&';
+        }
+        LogUserAction::model()->userAction($userId, $actionId, $params);
 
         $this->_return('MSG_SUCCESS', $data);
     }
 
+    /**
+     * action_id : 2403
+     * 用户完成测试试卷后提交试卷
+     * @userId $userId          -- 用户ID
+     * @token $token            -- 用户验证token
+     * @subject $testId       -- 本次测试对应编号
+     * @answer $answer         -- 提交答案
+     * @return result          调用返回结果
+     * @return msg             调用返回结果说明
+     * @return data             调用返回数据
+     */
     public function actionPostTestAnswer()
     {
         // 检查参数
@@ -106,7 +131,13 @@ class TestController extends ApiPublicController
             $this->_return('MSG_ERR_QUESTION');
         }
 
-        // 记录log
+        // TODO : add log
+        $actionId = 2403;
+        $params = '';
+        foreach($_REQUEST as $key => $value) {
+            $params .= $key . '=' . $value . '&';
+        }
+        LogUserAction::model()->userAction($userId, $actionId, $params);
 
         $this->_return('MSG_SUCCESS', $data);
     }

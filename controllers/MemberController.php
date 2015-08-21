@@ -11,6 +11,7 @@ class MemberController extends ApiPublicController
         var_dump(LogMobileCheckcode::model()->getCheckNum(6,0,9));
     }
     /**
+     * action_id : 2103
      * 获取验证码                actionGetVerificationCode()
      * @mobile $mobile string    --手机号码
      * @type $type int        --类型：1表示注册新用户，2表示找回密码,3表示绑定手机
@@ -50,12 +51,19 @@ class MemberController extends ApiPublicController
             $this->_return("MSG_ERR_INVALID_BIND_MOBILE");
         }
 
-        // 记录log
+        // TODO : add log
+        $actionId = 2103;
+        $params = '';
+        foreach($_REQUEST as $key => $value) {
+            $params .= $key . '=' . $value . '&';
+        }
+        LogUserAction::model()->userAction($userId = 0, $actionId, $params);
 
         $this->_return("MSG_SUCCESS", $data);   // $data为返回的验证码目前测试用，正式上线去除$data
     }
 
     /**
+     * action_id : 2014
      * 用户使用手机号码获取验证码后验证验证码
      * @mobile $mobile int             --手机号码
      * @checkNum $checkNum int         --服务器发送的验证码
@@ -82,12 +90,19 @@ class MemberController extends ApiPublicController
             $this->_return("MSG_ERR_CODE_OVER_TIME");
         }
 
-        // 记录log
+        // TODO : add log
+        $actionId = 2014;
+        $params = '';
+        foreach($_REQUEST as $key => $value) {
+            $params .= $key . '=' . $value . '&';
+        }
+        LogUserAction::model()->userAction($userId = 0, $actionId, $params);
 
         $this->_return('MSG_SUCCESS', $data);
     }
 
     /**
+     * action_id : 2105
      * 用户注册       actionRegister()
      * @mobile $mobile int             --手机号码
      * @password $password string      --密码（md5加密）
@@ -137,15 +152,22 @@ class MemberController extends ApiPublicController
             $this->_return("MSG_ERR_CODE_OVER_TIME");
         }
 
-        // 记录log
+        // TODO : add log
+        $actionId = 2105;
+        $params = '';
+        foreach($_REQUEST as $key => $value) {
+            $params .= $key . '=' . $value . '&';
+        }
+        LogUserAction::model()->userAction($userId = 0, $actionId, $params);
 
         $this->_return('MSG_SUCCESS', $data);
     }
 
     /**
+     * action_id : 2106
      * 用户绑定手机      actionBindMobile()
-     * @param $mobile int           --手机号码
-     * @param $password string      --密码（md5加密）
+     * @mobile $mobile int           --手机号码
+     * @password $password string      --密码（md5加密）
      * @checkNum $checkNum int      --服务器发送的验证码
      * @token  $token  string         --登录token
      * @userId  $userId int         --用户id(APP中用户的唯一标识)
@@ -182,12 +204,20 @@ class MemberController extends ApiPublicController
         } elseif ($data === 20007) {
             $this->_return("MSG_ERR_FAIL_TOKEN");
         }
-        // 记录log
+
+        // TODO : add log
+        $actionId = 2106;
+        $params = '';
+        foreach($_REQUEST as $key => $value) {
+            $params .= $key . '=' . $value . '&';
+        }
+        LogUserAction::model()->userAction($userId, $actionId, $params);
 
         $this->_return('MSG_SUCCESS', $data);
     }
 
     /**
+     * action_id : 2107
      * 用户自动注册      actionAutoRegister()
      * @return result          调用返回结果
      * @return msg             调用返回结果说明
@@ -209,12 +239,20 @@ class MemberController extends ApiPublicController
         if($data === 20019) {
             $this->_return('MSG_MOBILE_PASSWORD_LOGIN');
         }
-        // 记录log
+
+        // TODO : add log
+        $actionId = 2107;
+        $params = '';
+        foreach($_REQUEST as $key => $value) {
+            $params .= $key . '=' . $value . '&';
+        }
+        LogUserAction::model()->userAction($userId = 0, $actionId, $params);
 
         $this->_return('MSG_SUCCESS', $data);
     }
 
     /**
+     * action_id : 2109
      * 用户绑定学员信息      actionBindMember()
      * @salt $salt string           --绑定学员对应的口令
      * @token  $token  string       --登录token
@@ -242,18 +280,26 @@ class MemberController extends ApiPublicController
         } elseif ($data === 20015) {
             $this->_return('MSG_ERR_SALT');
         } elseif ($data === 20016) {
-            $this->_return('MSG_ERR_INVALID_SALT');
+            $this->_return('MSG_ERR_INVALID_MEMBER');
         } elseif ($data === 20018) {
             $this->_return('MSG_ERR_NULL_SALT');
         } elseif ($data === 20013) {
             $this->_return('MSG_ERR_OVER_THREE_MEMBERID');
         }
-        // 记录log
+
+        // TODO : add log
+        $actionId = 2109;
+        $params = '';
+        foreach($_REQUEST as $key => $value) {
+            $params .= $key . '=' . $value . '&';
+        }
+        LogUserAction::model()->userAction($userId, $actionId, $params);
 
         $this->_return('MSG_SUCCESS', $data);
     }
 
     /**
+     * action_id : 2110
      * 用户解除绑定学员信息      actionRemoveMember()
      * @memberId $memberId string       --绑定学员对应ID
      * @token  $token  string       --登录token
@@ -281,14 +327,21 @@ class MemberController extends ApiPublicController
         } elseif ($data === 20017) {
             $this->_return('MSG_ERR_FAIL_MEMBER');
         }
-        //记录log
+
+        // TODO : add log
+        $actionId = 2110;
+        $params = '';
+        foreach($_REQUEST as $key => $value) {
+            $params .= $key . '=' . $value . '&';
+        }
+        LogUserAction::model()->userAction($userId, $actionId, $params);
 
         $this->_return('MSG_SUCCESS', $data);
     }
 
     /**
+     * action_id : 2101
      * 登录接口 actionLogin()  手机号码，密码登录
-     *
      * @mobile $mobile string           --注册时使用的手机号
      * @password $password string       --注册时密码
      * @return result          调用返回结果
@@ -319,14 +372,20 @@ class MemberController extends ApiPublicController
             $this->_return('MSG_ERR_FAIL_PASSWORD');
         }
 
-        // 记录log
+        // TODO : add log
+        $actionId = 2101;
+        $params = '';
+        foreach($_REQUEST as $key => $value) {
+            $params .= $key . '=' . $value . '&';
+        }
+        LogUserAction::model()->userAction($userId = 0, $actionId, $params);
 
         $this->_return('MSG_SUCCESS', $data);
     }
 
     /**
+     * action_id : 2102
      * 用户自动登录接口 actionUserVerify()  登录token(在系统中存放30天有效);用户id
-     *
      * @token $token string     --登录token
      * @userId $userId int      --用户id
      * @return result          调用返回结果
@@ -362,12 +421,20 @@ class MemberController extends ApiPublicController
         $nowTime = date("Y-m-d H-i-s", strtotime("now"));              //当前时间
         LogUserLoginHistory::model()->log_user_login_history($userId, $loginIp, $version, $deviceId, $platform, $channel, $appVersion, $osVersion, $appId, $nowTime);
 
+        // TODO : add log
+        $actionId = 2102;
+        $params = '';
+        foreach($_REQUEST as $key => $value) {
+            $params .= $key . '=' . $value . '&';
+        }
+        LogUserAction::model()->userAction($userId, $actionId, $params);
+
         $this->_return('MSG_SUCCESS', $data);
     }
 
     /**
+     * action_id : 2108
      * 用户重置密码 actionResetPassword()
-     *
      * @mobile $mobile string           --注册用手机号
      * @password $password string       --密码(MD5加密)
      * @checkNum $checkNum string       --服务器验证码
@@ -402,14 +469,20 @@ class MemberController extends ApiPublicController
             $this->_return('MSG_ERR_UN_REGISTER_MOBILE');
         }
 
-        // 记录log
+        // TODO : add log
+        $actionId = 2108;
+        $params = '';
+        foreach($_REQUEST as $key => $value) {
+            $params .= $key . '=' . $value . '&';
+        }
+        LogUserAction::model()->userAction($userId = 0, $actionId, $params);
 
         $this->_return('MSG_SUCCESS', $data);
     }
 
     /**
+     * action_id : 2111
      * 用户在app中获取用户积分等相关信息
-     *
      * @token $token string     --登录token
      * @userId $userId int      --用户id
      * @return result          调用返回结果
@@ -437,12 +510,20 @@ class MemberController extends ApiPublicController
 
         $data = UserScoreHistory::model()->pointInfo($userId);
 
+        // TODO : add log
+        $actionId = 2111;
+        $params = '';
+        foreach($_REQUEST as $key => $value) {
+            $params .= $key . '=' . $value . '&';
+        }
+        LogUserAction::model()->userAction($userId, $actionId, $params);
+
         $this->_return('MSG_SUCCESS', $data);
     }
 
     /**
+     * action_id : 2112
      * 用户在app中进行签到，以获取相关积分
-     *
      * @token $token string     --登录token
      * @userId $userId int      --用户id
      * @signType $signType int  -- 签到类型signType
@@ -480,12 +561,20 @@ class MemberController extends ApiPublicController
             $this->_return('MSG_ERR_INVALID_SIGN');
         }
 
+        // TODO : add log
+        $actionId = 2112;
+        $params = '';
+        foreach($_REQUEST as $key => $value) {
+            $params .= $key . '=' . $value . '&';
+        }
+        LogUserAction::model()->userAction($userId, $actionId, $params);
+
         $this->_return('MSG_SUCCESS', $data);
     }
 
     /**
+     * action_id : 2113
      * 用户在app中进行签到抽奖，以获取相关积分
-     *
      * @token $token string     --登录token
      * @userId $userId int      --用户id
      * @return result          调用返回结果
@@ -516,6 +605,63 @@ class MemberController extends ApiPublicController
         if ($data === 20027) {
             $this->_return('MSG_ERR_INVALID_PRIZE');
         }
+
+        // TODO : add log
+        $actionId = 2113;
+        $params = '';
+        foreach($_REQUEST as $key => $value) {
+            $params .= $key . '=' . $value . '&';
+        }
+        LogUserAction::model()->userAction($userId, $actionId, $params);
+
+        $this->_return('MSG_SUCCESS', $data);
+    }
+
+    /**
+     * action_id : 2114
+     * 用户在app中获取积分历史
+     * @token $token string     --登录token
+     * @userId $userId int      --用户id
+     * @return result          调用返回结果
+     * @return msg             调用返回结果说明
+     * @return data             调用返回数据
+     */
+    public function actionGetUserPointHistory()
+    {
+        if(!isset($_REQUEST['token']) || !isset($_REQUEST['userId']) || !isset($_REQUEST['historyId']) ) {
+            $this->_return('MSG_ERR_LESS_PARAM');
+        }
+
+        $token = Yii::app()->request->getParam('token', NULL);
+        $userId = Yii::app()->request->getParam('userId', NULL);
+        $historyId = Yii::app()->request->getParam('historyId', NULL);
+
+        if(!ctype_digit($userId)) {
+            $this->_return('MSG_ERR_FAIL_USER');
+        }
+
+        if(!ctype_digit($historyId)) {
+            $this->_return('MSG_ERR_HISTORY_ID');
+        }
+
+        // 用户user/token验证
+        $userToken = UserToken::model()->IsToken($userId, $token);
+        if(!$userToken) {
+            $this->_return('MSG_ERR_FAIL_TOKEN');       // MSG_ERR_FAIL_TOKEN
+        }
+
+        $data = UserScoreHistory::model()->userPointHistory($userId, $historyId);
+        if($data === 20030) {
+            $this->_return('MSG_ERR_NULL_HISTORY');
+        }
+
+        // TODO : add log
+        $actionId = 2114;
+        $params = '';
+        foreach($_REQUEST as $key => $value) {
+            $params .= $key . '=' . $value . '&';
+        }
+        LogUserAction::model()->userAction($userId, $actionId, $params);
 
         $this->_return('MSG_SUCCESS', $data);
     }
