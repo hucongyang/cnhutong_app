@@ -71,6 +71,12 @@ $_error_code = array(
 
         'MSG_ERR_NULL_HISTORY'             => array('20030', '没有积分历史'),
 
+        'MSG_ERR_LEAVE_TYPE'             => array('20031', '请假类型错误'),
+
+        'MSG_ERR_NO_LEAVE'             => array('20032', '当前不能请假'),
+
+        'MSG_ERR_NO_CANCEL_LEAVE'      => array('20033', '当前不能取消请假'),
+
 		// 其它
 		'MSG_ERR_UNKOWN'			=> array('99999', '未知错误')
 );

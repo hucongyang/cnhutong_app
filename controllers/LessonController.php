@@ -250,7 +250,6 @@ class LessonController extends ApiPublicController
      * @param memberId      -- 用户当前绑定的学员所对应的ID
      * @param lessonStudentId  -- 课程的唯一排课编号
      * @param leaveType            -- 请假类型 1表示请假，2表示取消请假
-     * @param issue                -- 预约补课时间
      * @return result          调用返回结果
      * @return msg             调用返回结果说明
      * @return data             调用返回数据
@@ -260,7 +259,7 @@ class LessonController extends ApiPublicController
         // 检查参数
         if(!isset($_REQUEST['userId']) || !isset($_REQUEST['token'])
             || !isset($_REQUEST['memberId']) || !isset($_REQUEST['lessonStudentId'])
-            || !isset($_REQUEST['leaveType']) || !isset($_REQUEST['issue']))
+            || !isset($_REQUEST['leaveType']))
         {
             $this->_return('MSG_ERR_LESS_PARAM');
         }
@@ -270,9 +269,13 @@ class LessonController extends ApiPublicController
         $memberId = Yii::app()->request->getParam('memberId', NULL);
         $lessonStudentId = Yii::app()->request->getParam('lessonStudentId', NULL);
         $leaveType = Yii::app()->request->getParam('leaveType', NUll);
-        $issue = Yii::app()->request->getParam('issue', NUll);
 
-        $data = HtLessonStudent::model()->lessonStudentLeave($userId, $token, $memberId, $lessonStudentId, $leaveType, $issue);
+        $aType = array(1, 2);
+        if(!in_array($leaveType, $aType)) {
+            $this->_return('MSG_ERR_LEAVE_TYPE');
+        }
+
+        $data = HtLessonStudent::model()->lessonStudentLeave($userId, $token, $memberId, $lessonStudentId, $leaveType);
         if($data === 20008) {
             $this->_return('MSG_ERR_FAIL_USER');
         } elseif ($data === 20007) {

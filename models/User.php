@@ -308,17 +308,17 @@ class User extends CActiveRecord
                 );
 
             //userId
-            $data['userId'] = $userId;
+//            $data['userId'] = $userId;
             //token
-            $data['token'] = UserToken::model()->getToken($userId);
+//            $data['token'] = UserToken::model()->getToken($userId);
             //用户昵称，积分，等级
             $userMessage = self::getUserMessageByUserId($userId);
-            $data['mobile']             = $userMessage['mobile'];
+//            $data['mobile']             = $userMessage['mobile'];
             $data['nickname']           = $userMessage['username'];
-            $data['points']             = $userMessage['score'];
-            $data['level']              = $userMessage['level'];
+//            $data['points']             = $userMessage['score'];
+//            $data['level']              = $userMessage['level'];
             //members
-            $data['members'] = UserMember::model()->getMembers($userId);
+//            $data['members'] = UserMember::model()->getMembers($userId);
 
         } catch (Exception $e) {
             error_log($e);

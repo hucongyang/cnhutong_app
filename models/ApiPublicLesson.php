@@ -149,4 +149,30 @@ class ApiPublicLesson extends CActiveRecord
         }
         return $lessonSerial * 2;   //上一次课是2个课时
     }
+
+    /**
+     * 输入 学员memberId, 课时唯一编号lessonStudentId
+     * @param $memberId
+     * @param $lessonStudentId
+     * @return string
+     */
+    public function getDepartmentId($memberId, $lessonStudentId)
+    {
+        $department = '';
+        try {
+            $department = Yii::app()->cnhutong->createCommand()
+                ->select('department_id')
+                ->from('ht_lesson_student')
+                ->where('id = :lessonStudentId And student_id = :memberId',
+                    array(
+                        ':lessonStudentId' => $lessonStudentId,
+                        ':memberId' => $memberId
+                    )
+                )
+                ->queryScalar();
+        } catch (Exception $e) {
+            error_log($e);
+        }
+        return $department;
+    }
 }

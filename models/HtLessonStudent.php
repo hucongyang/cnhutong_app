@@ -202,7 +202,7 @@ class HtLessonStudent extends CActiveRecord
 
             $result = Yii::app()->cnhutong->createCommand()
                 ->select('id as lessonStudentId, lesson_serial as lessonSerial,
-                date, time, step, student_comment')
+                date, time, status_id, step, student_rating')
                 ->from('ht_lesson_student')
                 ->where('student_id = :studentId And lesson_arrange_id = :lessonArrangeId',
                     array(
@@ -224,8 +224,19 @@ class HtLessonStudent extends CActiveRecord
                 $lessons['lessonStudentId']                     = $row['lessonStudentId'];
                 $lessons['lessonSerial']                        = $row['lessonSerial'];
                 $lessons['lessonDate']                          = $row['date'] . ' ' . $row['time'];
-                $lessons['lessonStatus']                        = self::getLessonStatusNow($row['step']);
-                $lessons['lessonCharge']                        = $row['student_comment'];
+//                if($row['step'] == 0 || $row['step'] == 1) {
+//                    $lessons['lessonStatus']                    = self::getLessonStudentStatus($row['status_id']);
+//                } else {
+//                    $lessons['lessonStatus']                        = self::getLessonStudentStep($row['step']);
+//                }
+//
+//                $lessons['lessonCharge']                        = $row['student_rating'];
+                // 测试用
+//                $lessons['statusId']                          = $row['status_id'];
+//                $lessons['step']                               = $row['step'];
+//                $lessons['student_rating']                    = $row['student_rating'];
+
+                $lessons['lessonStatus']                        = self::lessonStatus($row['step'], $row['status_id'], $row['student_rating']);
 
                 $data['lessons'][] = $lessons;
             }
@@ -423,12 +434,99 @@ class HtLessonStudent extends CActiveRecord
      * @param $memberId
      * @param $lessonStudentId
      * @param $leaveType
-     * @param $issue
      * @return array|int
      */
-    public function lessonStudentLeave($userId, $token, $memberId, $lessonStudentId, $leaveType, $issue)
+    public function lessonStudentLeave($userId, $token, $memberId, $lessonStudentId, $leaveType)
     {
+        $nowTime = date("Y-m-d H-i-s");
+        $data = array();
+        try {
+            // 用户ID验证
+            $user = User::model()->IsUserId($userId);
+            if(!$user) {
+                return 20008;       // MSG_ERR_FAIL_USER
+            }
+            // 用户token验证
+            $userToken = UserToken::model()->IsToken($userId, $token);
+//            var_dump($userToken);exit;
+            if(!$userToken) {
+                return 20007;       // MSG_ERR_FAIL_TOKEN
+            }
 
+            $isExistUserMemberId = UserMember::model()->IsExistMemberId($userId, $memberId);
+            if(!$isExistUserMemberId) {
+                return 200017;        // MSG_ERR_FAIL_MEMBER
+            }
+
+            $isLessonStudentId = self::IsLessonStudentId($memberId, $lessonStudentId);
+            if(!$isLessonStudentId) {
+                return 20021;         // MSG_ERR_LESSON_STUDENT_ID
+            }
+
+            // step 状态  0 - 等待确认，1 - 取消请假，3 - 锁定，2 - 请假完成
+            $aStep = array(0, 1, 2, 3);
+            // 学员请假
+            if($leaveType == 1) {
+                $reminder = self::getHtReminder(410, 82);
+                if($reminder) {                                 // 请假记录存在
+                    $step = $reminder['step'];
+                    if($step == 1) {                            // 学员请假后，客服未处理。学员又取消了请假,此时可以请假
+                        self::setStep($memberId, $lessonStudentId, $step);      // 设置请假状态
+                    } else {
+                        return 20032;               //MSG_ERR_NO_LEAVE
+                    }
+                } else {                                        // 请假记录不存在
+                    self::insertLeave($memberId, $lessonStudentId);     // 增加请假记录
+                }
+
+//                var_dump($reminder['step']);
+            } elseif ($leaveType == 2) {
+                $reminder = self::getHtReminder(410, 82);
+                if(!$reminder) {
+                    return 20033;                   // MSG_ERR_NO_CANCEL_LEAVE
+                } else {
+                    
+                }
+
+//                var_dump(7);
+            } else {
+                return 20031;
+            }
+
+        } catch (Exception $e) {
+            error_log($e);
+        }
+        return $data;
+    }
+
+    /**
+     * 输入课时标识，输出课时状态
+     * @param $step
+     * @param $statusId
+     * @param $isRating
+     * @return int
+     */
+    public function lessonStatus($step, $statusId, $isRating)
+    {
+        $queQin = array(2,3,4,5,7,8);        // ht_lessonStudent step 为数组中数组为缺勤
+        $normal = array(0,1);               // 正常
+        if(in_array($step, $queQin)) {
+            return 5;                           // 课时状态为 缺勤
+        } elseif ($step == 6) {
+            return 4;                           // 课时状态为 请假
+        } elseif (in_array($step, $normal)) {
+            if($statusId == 0) {
+                return 3;                       // 课时状态为 未上
+            } else {
+                if($isRating) {
+                    return 2;                   // 课时状态为 已上已评
+                } else {
+                    return 1;                   // 课时状态为 已上未评
+                }
+            }
+        } else {
+            return 9999;                        // 课时状态为 未知状态
+        }
     }
 
     /**
@@ -437,51 +535,44 @@ class HtLessonStudent extends CActiveRecord
      * @param $step
      * @return string
      */
-    public function getLessonStatus($step)
+    public function getLessonStudentStep($step)
     {
         switch ($step) {
             case "0":
                 return "正常";
             case "1":
-                return "补课";
+                return "正常";        // 补课
             case "2":
                 return "缺勤";
             case "3":
-                return "弃课";
+                return "缺勤";        // 弃课
             case "4":
-                return "冻结";
+                return "缺勤";        // 冻结
             case "5":
-                return "退费";
+                return "缺勤";        // 退费
             case "6":
                 return "请假";
             case "7":
                 return "顺延补课";
             case "8":
-                return "补课后弃课";
+                return "缺勤";        // 补课后弃课
             default:
                 return '';
         }
     }
 
     /**
-     * 输入 状态 step 0-1-2
-     * 输出 对应的课时状态 未上，已上未平，已上已评
-     * @param $step
+     * 输入 状态 step 0-1
+     * 输出 对应的课时状态 未上课，已上课
+     * @param $status
      * @return string
      */
-    public function getLessonStatusNow($step)
+    public function getLessonStudentStatus($status)
     {
-        switch ($step) {
-            case "0":
-                return "未上";
-            case "1":
-                return "已上未平";
-            case "2":
-                return "已上已评";
-            case "3":
-                return "请假";
-            default:
-                return '';
+        if($status == 0) {
+            return '未上课';
+        } else {
+            return '已上课';
         }
     }
 
@@ -565,5 +656,92 @@ class HtLessonStudent extends CActiveRecord
             error_log($e);
         }
         return $id;
+    }
+
+    /**
+     * 获得CS系统请假相关表 ht_reminder 相关字段信息
+     * 详情请查阅：秦汉胡同App请假流程对接价值中心CS系统文档说明
+     * 输入：学员 memberId；课时唯一编号 lessonStudentId
+     * 输出：请假相关字段信息
+     * @param $memberId
+     * @param $lessonStudentId
+     * @return array
+     */
+    public function getHtReminder($memberId, $lessonStudentId)
+    {
+        $result = array();
+        try {
+            $result = Yii::app()->cnhutong->createCommand()
+                ->select('id, step')
+                ->from('ht_reminder')
+                ->where('member_id = :memberId And item_id = :lessonStudentId',
+                    array(
+                        ':memberId' => $memberId,
+                        ':lessonStudentId' => $lessonStudentId
+                    )
+                )
+                ->queryRow();
+
+        } catch (Exception $e) {
+            error_log($e);
+        }
+        return $result;
+    }
+
+    /**
+     * 设置请假状态 step
+     * @param $memberId
+     * @param $lessonStudentId
+     * @param $step
+     * @return int
+     */
+    public function setStep($memberId, $lessonStudentId, $step)
+    {
+        $data = 0;
+        try {
+            $data = Yii::app()->cnhutong->createCommand()
+                ->update('ht_reminder',
+                    array('step' => $step),
+                    'member_id = :memberId And item_id = :lessonStudentId',
+                    array(
+                        ':memberId' => $memberId,
+                        ':lessonStudentId' => $lessonStudentId
+                    )
+                );
+        } catch (Exception $e) {
+            error_log($e);
+        }
+        return $data;
+    }
+
+    /**
+     * 学员请假插入数据记录
+     * @param $memberId
+     * @param $lessonStudentId
+     * @return int
+     */
+    public function insertLeave($memberId, $lessonStudentId)
+    {
+        $nowTime = date('Y-m-d H:m:s');
+        $data = 0;
+        try {
+            $departmentId = ApiPublicLesson::model()->getDepartmentId($memberId, $lessonStudentId);     // 获区校区ID
+
+            $data = Yii::app()->cnhutong->createCommand()
+                ->insert('ht_reminder',
+                    array(
+                        'member_id' => $memberId,           // 学员memberId
+                        'item_type' => 7,                   // 请假标识为7
+                        'item_id' => $lessonStudentId,      // 课时唯一标识
+                        'create_time' => $nowTime,
+                        'step' => 0,                        // step为等待确认
+                        'to_member_id' => 0,                // 分配处理学员请假流程的客服memberId
+                        'department_id' => $departmentId    // 学员所在的校区
+                    )
+                );
+        } catch (Exception $e) {
+            error_log($e);
+        }
+        return $data;
     }
 }

@@ -8,7 +8,7 @@ class TestController extends ApiPublicController
 {
     /**
      * action_id : 2401
-     * 在列表业内获取每个学科（类别）所进行过测试的人数
+     * 在页面中获取每个学科（类别）所进行过测试的人数
      * @userId $userId       -- 用户ID
      * @token $token        -- 用户验证token
      * @return result          调用返回结果
@@ -25,14 +25,6 @@ class TestController extends ApiPublicController
 
         $userId = Yii::app()->request->getParam('userId', NULL);
         $token = Yii::app()->request->getParam('token', NULL);
-
-        $version            = Yii::app()->request->getParam('version', NULL);
-        $deviceId           = Yii::app()->request->getParam('deviceId', NULL);
-        $platform           = Yii::app()->request->getParam('platform', NULL);
-        $channel            = Yii::app()->request->getParam('channel', NULL);
-        $appVersion         = Yii::app()->request->getParam('appVersion', NULL);
-        $osVersion          = Yii::app()->request->getParam('osVersion', NULL);
-        $appId              = Yii::app()->request->getParam('appId', NULL);
 
         $data = UserQuestionHistory::model()->getTestUsers($userId, $token);
 //        var_dump($data);exit;

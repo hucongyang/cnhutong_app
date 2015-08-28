@@ -13,7 +13,7 @@ class ComQuestion extends CActiveRecord
     }
 
     /**
-     * 用户获取试卷进行测试，获取10题 进行测试
+     * 用户获取试卷进行测试，获取5题 进行测试
      * @param $userId
      * @param $token
      * @param $subject
@@ -36,18 +36,28 @@ class ComQuestion extends CActiveRecord
                 return 20007;       // MSG_ERR_FAIL_TOKEN
             }
             // 验证测试类别
-            $userSubject = self::IsSubject($subject);
+            $subjects = self::IsSubject();
+            $userSubject = in_array($subject, $subjects);
             if(!$userSubject) {
                 return 20010;       // MSG_ERR_FAIL_SUBJECT
             }
 
-            $result = Yii::app()->cnhutong_user->createCommand()
-                ->select('id, type, content, answer_a, answer_b, answer_c, answer_d, answer')
-                ->from('com_question')
-                ->where('subject = :subject', array(':subject' => $subject))
-                ->order('rand()')
-                ->limit('5')
-                ->queryAll();
+            if($subject == 1) {
+                $result = Yii::app()->cnhutong_user->createCommand()
+                    ->select('id, type, content, answer_a, answer_b, answer_c, answer_d, answer')
+                    ->from('com_question')
+                    ->order('rand()')
+                    ->limit('5')
+                    ->queryAll();
+            } else {
+                $result = Yii::app()->cnhutong_user->createCommand()
+                    ->select('id, type, content, answer_a, answer_b, answer_c, answer_d, answer')
+                    ->from('com_question')
+                    ->where('subject = :subject', array(':subject' => $subject))
+                    ->order('rand()')
+                    ->limit('5')
+                    ->queryAll();
+            }
 
             $question_id = '';
             $answers = '';
@@ -55,10 +65,13 @@ class ComQuestion extends CActiveRecord
                 $question_id                           .= $value['id'] . '|';
                 $answers                               .= $value['answer'] . '|';
             }
+            $question_id = rtrim($question_id, "|");
+            $answers = rtrim($answers, "|");
 //            // 测试用
 //            $data['question_id']                  = $question_id;
 //            $data['answers']                  = $answers;
 
+            // 生成题目记录到user_question_history
             $question_history = Yii::app()->cnhutong_user->createCommand()
                 ->insert('user_question_history',
                     array(
@@ -69,6 +82,7 @@ class ComQuestion extends CActiveRecord
                         'score' =>  0,
                         'subject' => $subject
                     ));
+            // 取得插入题目的测试编号
             $testId = Yii::app()->cnhutong_user->getLastInsertID();
             $data['testId'] = $testId;
             foreach($result as $row) {
@@ -85,6 +99,16 @@ class ComQuestion extends CActiveRecord
                 $data['questions'][] = $question_filter;
             }
 
+            // 增加题库类型相应测试人数
+            $testUsers = self::getTestUsers($subject);
+            $testUsers++;       // 测试人数相应加1
+            $addTestUsers = Yii::app()->cnhutong_user->createCommand()
+                ->update('com_subject',
+                    array('testUsers' => $testUsers),
+                    'id = :subject',
+                    array(':subject' => $subject)
+                );
+
         } catch (Exception $e) {
             error_log($e);
         }
@@ -93,22 +117,46 @@ class ComQuestion extends CActiveRecord
 
     /**
      * 输入：$subject 对应测试类别
-     * 输出：$id 对应类别是否存在
-     * @param $subject
-     * @return string
+     * 输出：对应类别数组(step为1表示已有试卷，0表示没有试卷，不能做题)
+     * @subject $subject
+     * @return array
      */
-    public function IsSubject($subject)
+    public function IsSubject()
     {
-        $id = '';
+        $subject = array();
         try {
-            $id = Yii::app()->cnhutong_user->createCommand()
+            $result = Yii::app()->cnhutong_user->createCommand()
                 ->select('id')
-                ->from('com_question')
-                ->where('subject = :subject', array(':subject' => $subject))
+                ->from('com_subject')
+                ->where('step = 1')
+                ->queryAll();
+
+            foreach($result as $row) {
+                $subject[] = $row['id'];
+            }
+        } catch (Exception $e) {
+            error_log($e);
+        }
+        return $subject;
+    }
+
+    /**
+     * 获得相应测试类型的测试人数
+     * @param $subject
+     * @return int
+     */
+    public function getTestUsers($subject)
+    {
+        $result = 0;
+        try {
+            $result = Yii::app()->cnhutong_user->createCommand()
+                ->select('testUsers')
+                ->from('com_subject')
+                ->where('id = :subject And step = 1', array(':subject' => $subject))
                 ->queryScalar();
         } catch (Exception $e) {
             error_log($e);
         }
-        return $id;
+        return $result;
     }
 }

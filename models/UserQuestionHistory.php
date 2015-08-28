@@ -34,26 +34,43 @@ class UserQuestionHistory extends CActiveRecord
                 return 20007;       // MSG_ERR_FAIL_TOKEN
             }
 
+//            $result = Yii::app()->cnhutong_user->createCommand()
+//                ->select('COUNT(*) as testUsers, subject')
+//                ->from('user_question_history')
+//                ->group('subject')
+//                ->order('testUsers desc')
+//                ->queryAll();
+//
+//            foreach($result as $row) {
+//                //获取数据
+//                $subjects = array();
+//
+//                $subjects['subjectId']              = $row['subject'];
+//                if($row['subject'] == 0) {
+//                    $subjects['subjectName']            = '综合';
+//                } else {
+//                    $subjectInfo                          = ApiPublicLesson::model()->getSubjectInfoById($row['subject']);
+//                    $subjects['subjectName']            = $subjectInfo['title'];
+//                }
+//
+//                $subjects['testUsers']              = $row['testUsers'];
+//                $data['subjects'][] = $subjects;
+//            }
+
             $result = Yii::app()->cnhutong_user->createCommand()
-                ->select('COUNT(*) as testUsers, subject')
-                ->from('user_question_history')
-                ->group('subject')
-                ->order('subject asc')
+                ->select('id, title, picture, testUsers')
+                ->from('com_subject')
+                ->where('step = 1')
+                ->order('id')
                 ->queryAll();
 
-            // 判断数据是否为空数组
-            if(ApiPublicController::array_is_null($result)) {
-                $data[] = [];
-            }
-
             foreach($result as $row) {
-                //获取数据
+                // 获取数据
                 $subjects = array();
-
-                $subjects['subjectId']              = $row['subject'];
-                $subjectInfo                          = ApiPublicLesson::model()->getSubjectInfoById($row['subject']);
-                $subjects['subjectName']            = $subjectInfo['title'];
-                $subjects['testUsers']              = $row['testUsers'];
+                $subjects['subjectId']               = $row['id'];
+                $subjects['subjectName']             = $row['title'];
+                $subjects['testUsers']               = $row['testUsers'];
+                $subjects['picture']                  = $row['picture'];
                 $data['subjects'][] = $subjects;
             }
 
@@ -111,6 +128,10 @@ class UserQuestionHistory extends CActiveRecord
                 $q .= $questions[$j][0] . '|';
                 $a .= $questions[$j][1] . '|';
             }
+
+            $q = rtrim($q, "|");
+            $a = rtrim($a, "|");
+
 //            var_dump($questions);
 //            var_dump($q);
 //            var_dump($a);
@@ -142,7 +163,7 @@ class UserQuestionHistory extends CActiveRecord
 //            var_dump($aRightQuestion);
 //            var_dump($aQuestion);
 
-            // 比对数组交集
+            // 比对题目数组交集
             $count = count(array_intersect_assoc($aRightQuestion, $aQuestion));
 //            var_dump(array_intersect_assoc($aRightQuestion, $aQuestion));
 //            var_dump($count);
@@ -154,7 +175,7 @@ class UserQuestionHistory extends CActiveRecord
             }
 
             // 比对答案得出分数
-            $score = (count(array_intersect_assoc($aRightAnswer, $aAnswer)) - 1)* 10;
+            $score = count(array_intersect_assoc($aRightAnswer, $aAnswer)) * 20;
 //            var_dump($score);
 //            var_dump(array_intersect_assoc($aRightAnswer, $aAnswer));
 
@@ -173,6 +194,16 @@ class UserQuestionHistory extends CActiveRecord
                     )
                 );
 
+            // 获得此课程类型的所有答题分数
+            $scores = self::getAllScores($testId);
+            // 得分在分数组中位置
+            $num = array_search($score, $scores) + 1;
+            // 课程答题人数
+            $testUsers = self::testUsers($testId);
+            $percent = ($num / $testUsers) * 10000;
+            $percent = explode(".", $percent);
+//            $data['scores'] = $scores;
+            $data['percent'] = $percent[0];
             $data['testScore'] = $score;
             $data['point'] = '10分';             // 做题积分功能待定
 
@@ -183,6 +214,7 @@ class UserQuestionHistory extends CActiveRecord
     }
 
     /**
+     * 判断是否为合理的测试编号
      * @param $testId
      * @return string
      */
@@ -199,5 +231,57 @@ class UserQuestionHistory extends CActiveRecord
             error_log($e);
         }
         return $id;
+    }
+
+    /**
+     * 获得测试编号对应课程所有测试分数数组
+     * @param $testId
+     * @return array
+     */
+    public function getAllScores($testId)
+    {
+        $scores = array();
+        try {
+            $subject = Yii::app()->cnhutong_user->createCommand()
+                ->select('subject')
+                ->from('user_question_history')
+                ->where('id = :testId', array(':testId' => $testId))
+                ->queryScalar();
+
+            $result = Yii::app()->cnhutong_user->createCommand()
+                ->select('score')
+                ->from('user_question_history')
+                ->where('subject = :subject', array(':subject' => $subject))
+                ->order('score asc')
+                ->queryAll();
+
+            foreach($result as $row) {
+                $scores[] = $row['score'];
+            }
+        } catch (Exception $e) {
+            error_log($e);
+        }
+        return $scores;
+    }
+
+    public function testUsers($testId)
+    {
+        $testUsers = 0;
+        try {
+            $subject = Yii::app()->cnhutong_user->createCommand()
+                ->select('subject')
+                ->from('user_question_history')
+                ->where('id = :testId', array(':testId' => $testId))
+                ->queryScalar();
+
+            $testUsers = Yii::app()->cnhutong_user->createCommand()
+                ->select('testUsers')
+                ->from('com_subject')
+                ->where('id = :subject', array(':subject' => $subject))
+                ->queryScalar();
+        } catch (Exception $e) {
+            error_log($e);
+        }
+        return $testUsers;
     }
 }

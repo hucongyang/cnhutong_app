@@ -35,7 +35,8 @@ class ComDepartment extends CActiveRecord
                     'address' => $row['address'],
                     'pointX' => $row['point_x'],
                     'pointY' => $row['point_y'],
-                    'photo' => self::getSchoolPictureById($row['id'])
+//                    'photo' => self::getSchoolPictureById($row['id'])
+                    'photo' => $row['picture']
                 );
                 $data['schools'] = $school;
             }

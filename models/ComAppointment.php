@@ -23,6 +23,7 @@ class ComAppointment extends CActiveRecord
     public function postAppointment($userId, $name, $mobile, $subject)
     {
         $result = 0;
+        $nowTime = date("Y-m-d H-i-s");              //当前时间
         try {
             $result = Yii::app()->cnhutong_user->createCommand()
                 ->insert('com_appointment',
@@ -30,7 +31,8 @@ class ComAppointment extends CActiveRecord
                         'user_id' => $userId,
                         'name' => $name,
                         'mobile' => $mobile,
-                        'subject' => $subject
+                        'subject' => $subject,
+                        'create_ts' => $nowTime
                     )
                 );
         } catch (Exception $e) {
