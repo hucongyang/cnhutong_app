@@ -94,6 +94,7 @@ class LessonController extends ApiPublicController
      * @param token         -- 用户验证token
      * @param memberId      -- 用户当前绑定的学员所对应的ID
      * @param lessonArrangeId  -- 课程的唯一排课编号
+     * @param time              -- 课程时间 年月
      * @return result          调用返回结果
      * @return msg             调用返回结果说明
      * @return data             调用返回数据
@@ -102,7 +103,8 @@ class LessonController extends ApiPublicController
     {
         // 检查参数
         if(!isset($_REQUEST['userId']) || !isset($_REQUEST['token'])
-            || !isset($_REQUEST['memberId']) || !isset($_REQUEST['lessonArrangeId']))
+            || !isset($_REQUEST['memberId']) || !isset($_REQUEST['lessonArrangeId'])
+            || !isset($_REQUEST['time']))
         {
             $this->_return('MSG_ERR_LESS_PARAM');
         }
@@ -111,8 +113,9 @@ class LessonController extends ApiPublicController
         $token = Yii::app()->request->getParam('token', NULL);
         $memberId = Yii::app()->request->getParam('memberId', NULL);
         $lessonArrangeId = Yii::app()->request->getParam('lessonArrangeId', NULL);
+        $time = Yii::app()->request->getParam('time', NULL);
 
-        $data = HtLessonStudent::model()->SubjectSchedule($userId, $token, $memberId, $lessonArrangeId);
+        $data = HtLessonStudent::model()->SubjectSchedule($userId, $token, $memberId, $lessonArrangeId, $time);
         if($data === 20008) {
             $this->_return('MSG_ERR_FAIL_USER');
         } elseif ($data === 20007) {
@@ -149,7 +152,7 @@ class LessonController extends ApiPublicController
     {
         // 检查参数
         if(!isset($_REQUEST['userId']) || !isset($_REQUEST['token'])
-            || !isset($_REQUEST['memberId']) || !isset($_REQUEST['lessonArrangeId']))
+            || !isset($_REQUEST['memberId']) || !isset($_REQUEST['lessonStudentId']))
         {
             $this->_return('MSG_ERR_LESS_PARAM');
         }
@@ -160,6 +163,7 @@ class LessonController extends ApiPublicController
         $lessonStudentId = Yii::app()->request->getParam('lessonStudentId', NULL);
 
         $data = HtLessonStudent::model()->lessonDetails($userId, $token, $memberId, $lessonStudentId);
+//        var_dump($data);
         if($data === 20008) {
             $this->_return('MSG_ERR_FAIL_USER');
         } elseif ($data === 20007) {
@@ -280,6 +284,16 @@ class LessonController extends ApiPublicController
             $this->_return('MSG_ERR_FAIL_USER');
         } elseif ($data === 20007) {
             $this->_return('MSG_ERR_FAIL_TOKEN');
+        } elseif ($data === 20017) {
+            $this->_return('MSG_ERR_FAIL_MEMBER');
+        } elseif ($data === 20021) {
+            $this->_return('MSG_ERR_LESSON_STUDENT_ID');
+        } elseif ($data === 20031) {
+            $this->_return('MSG_ERR_LEAVE_TYPE');
+        } elseif ($data === 20032) {
+            $this->_return('MSG_ERR_NO_LEAVE');
+        } elseif ($data === 20033) {
+            $this->_return('MSG_ERR_NO_CANCEL_LEAVE');
         }
 
         // TODO : add log

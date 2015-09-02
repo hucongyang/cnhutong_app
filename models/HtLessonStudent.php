@@ -119,7 +119,7 @@ class HtLessonStudent extends CActiveRecord
             }
 
             $result = Yii::app()->cnhutong->createCommand()
-                ->select('id, course_id, teacher_id, cnt, department_id')
+                ->select('id, course_id, teacher_id, cnt, department_id, startTime, endTime')
                 ->from('ht_lesson_arrange_rules')
                 ->where('student_id = :studentId',
                     array(
@@ -156,6 +156,8 @@ class HtLessonStudent extends CActiveRecord
                 $subject['departmentId']                      = $row['department_id'];
                 $departmentInfo = ApiPublicLesson::model()->getDepartmentInfoById($subject['departmentId']);
                 $subject['departmentName']                    = $departmentInfo['name'] . '分院';
+                $subject['startTime']                           = $row['startTime'];
+                $subject['endTime']                             = $row['endTime'];
                 $data['subjects'][] = $subject;
             }
 
@@ -172,9 +174,10 @@ class HtLessonStudent extends CActiveRecord
      * @param $token        -- 用户验证token
      * @param $memberId     -- 用户当前绑定的学员所对应的ID
      * @param $lessonArrangeId      -- 课程的唯一排课编号
+     * @param $time      -- 课程时间年月
      * @return array
      */
-    public function subjectSchedule($userId, $token, $memberId, $lessonArrangeId)
+    public function subjectSchedule($userId, $token, $memberId, $lessonArrangeId, $time)
     {
         $data = array();
         try {
@@ -214,16 +217,18 @@ class HtLessonStudent extends CActiveRecord
                 ->queryAll();
 
             // 判断数据是否为空数组
-            if(ApiPublicController::array_is_null($result)) {
-                $data[] = [];
+            if(!$result) {
+                $data['lessons'][] = [];
             }
 
             foreach($result as $row) {
                 // 获取数据
                 $lessons = array();
-                $lessons['lessonStudentId']                     = $row['lessonStudentId'];
-                $lessons['lessonSerial']                        = $row['lessonSerial'];
-                $lessons['lessonDate']                          = $row['date'] . ' ' . $row['time'];
+                $date    = date("Y-m", strtotime($row['date']));
+                if($date == $time) {
+                    $lessons['lessonStudentId']                     = $row['lessonStudentId'];
+                    $lessons['lessonSerial']                        = $row['lessonSerial'];
+                    $lessons['lessonDate']                          = $row['date'] . ' ' . $row['time'];
 //                if($row['step'] == 0 || $row['step'] == 1) {
 //                    $lessons['lessonStatus']                    = self::getLessonStudentStatus($row['status_id']);
 //                } else {
@@ -231,12 +236,16 @@ class HtLessonStudent extends CActiveRecord
 //                }
 //
 //                $lessons['lessonCharge']                        = $row['student_rating'];
-                // 测试用
+                    // 测试用
 //                $lessons['statusId']                          = $row['status_id'];
 //                $lessons['step']                               = $row['step'];
 //                $lessons['student_rating']                    = $row['student_rating'];
 
-                $lessons['lessonStatus']                        = self::lessonStatus($row['step'], $row['status_id'], $row['student_rating']);
+                    $lessons['lessonStatus']                        = self::lessonStatus($row['step'], $row['status_id'], $row['student_rating']);
+
+                } else {
+                    continue;
+                }
 
                 $data['lessons'][] = $lessons;
             }
@@ -283,7 +292,7 @@ class HtLessonStudent extends CActiveRecord
             }
 
             $result = Yii::app()->cnhutong->createCommand()
-                ->select('id as lessonStudentId, lesson_serial as lessonSerial, date, time,
+                ->select('id as lessonStudentId, lesson_serial as lessonSerial, date, time, status_id,
                 step, teacher_id as teacherId, student_rating, student_comment, lesson_content')
                 ->from('ht_lesson_student')
                 ->where('student_id = :studentId And id = :id',
@@ -306,7 +315,8 @@ class HtLessonStudent extends CActiveRecord
                 $lessonDetail['lessonStudentId']                = $row['lessonStudentId'];
                 $lessonDetail['lessonSerial']                   = $row['lessonSerial'];
                 $lessonDetail['lessonDate']                     = $row['date'] . ' ' . $row['time'];
-                $lessonDetail['lessonStatus']                   = self::getLessonStatusNow($row['step']);
+//                $lessonDetail['lessonStatus']                   = self::getLessonStatusNow($row['step']);
+                $lessonDetail['lessonStatus']                  = self::lessonStatus($row['step'], $row['status_id'], $row['student_rating']);   // 此课程状态和课程表的课时状态保持一致；状态为3表示未上，可以请假，其他状态都不可请假
                 $lessonDetail['teacherId']                      = $row['teacherId'];
                 $lessonDetail['teacherName']                    = ApiPublicLesson::model()->getNameByMemberId($row['teacherId']);
 //                $lessonDetail['lessonScore']                    = $row['student_rating'];
@@ -332,11 +342,23 @@ class HtLessonStudent extends CActiveRecord
                 if(empty($lessonDetail['lessonContent'])) {
                     $lessonDetail['lessonContent']    = '';
                 }
+
+                // 课时状态数组 aStatus
+                $aStatus = array(1, 2, 4, 5);
+                if(in_array($lessonDetail['lessonStatus'], $aStatus)) {
+                    $step = 4;
+                } elseif ($lessonDetail['lessonStatus'] == 1) {
+                    $leave = self::getHtReminder($memberId, $lessonStudentId);
+                    $step = $leave['step'];
+                }
+                $lessonDetail['step'] = $step;
+
                 $data[] = $lessonDetail;
             }
 
 //            $data = $result;
         } catch (Exception $e) {
+            var_dump($e);
             error_log($e);
         }
         return $data;
@@ -455,7 +477,7 @@ class HtLessonStudent extends CActiveRecord
 
             $isExistUserMemberId = UserMember::model()->IsExistMemberId($userId, $memberId);
             if(!$isExistUserMemberId) {
-                return 200017;        // MSG_ERR_FAIL_MEMBER
+                return 20017;        // MSG_ERR_FAIL_MEMBER
             }
 
             $isLessonStudentId = self::IsLessonStudentId($memberId, $lessonStudentId);
@@ -467,11 +489,11 @@ class HtLessonStudent extends CActiveRecord
             $aStep = array(0, 1, 2, 3);
             // 学员请假
             if($leaveType == 1) {
-                $reminder = self::getHtReminder(410, 82);
+                $reminder = self::getHtReminder($memberId, $lessonStudentId);       // 测试memberId = 410, lessonStudentId = 82
                 if($reminder) {                                 // 请假记录存在
                     $step = $reminder['step'];
                     if($step == 1) {                            // 学员请假后，客服未处理。学员又取消了请假,此时可以请假
-                        self::setStep($memberId, $lessonStudentId, $step);      // 设置请假状态
+                        self::setStep($memberId, $lessonStudentId, 0);      // 设置请假状态 为请假
                     } else {
                         return 20032;               //MSG_ERR_NO_LEAVE
                     }
@@ -481,13 +503,17 @@ class HtLessonStudent extends CActiveRecord
 
 //                var_dump($reminder['step']);
             } elseif ($leaveType == 2) {
-                $reminder = self::getHtReminder(410, 82);
-                if(!$reminder) {
+                $reminder = self::getHtReminder($memberId, $lessonStudentId);
+                if(!$reminder) {                                // 请假记录不存在,当然不能取消请假
                     return 20033;                   // MSG_ERR_NO_CANCEL_LEAVE
-                } else {
-                    
+                } else {                                        // 请假记录存在，且 step = 0 则可以取消请假
+                    $step = $reminder['step'];
+                    if($step == 0) {
+                        self::setStep($memberId, $lessonStudentId, 1);        // 设置请假状态 为取消请假
+                    } else {
+                        return 20033;               // MSG_ERR_NO_CANCEL_LEAVE
+                    }
                 }
-
 //                var_dump(7);
             } else {
                 return 20031;
@@ -697,9 +723,9 @@ class HtLessonStudent extends CActiveRecord
      */
     public function setStep($memberId, $lessonStudentId, $step)
     {
-        $data = 0;
+        $result = 0;
         try {
-            $data = Yii::app()->cnhutong->createCommand()
+            $result = Yii::app()->cnhutong->createCommand()
                 ->update('ht_reminder',
                     array('step' => $step),
                     'member_id = :memberId And item_id = :lessonStudentId',
@@ -711,7 +737,7 @@ class HtLessonStudent extends CActiveRecord
         } catch (Exception $e) {
             error_log($e);
         }
-        return $data;
+        return $result;
     }
 
     /**

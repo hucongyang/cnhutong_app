@@ -73,9 +73,17 @@ $_error_code = array(
 
         'MSG_ERR_LEAVE_TYPE'             => array('20031', '请假类型错误'),
 
-        'MSG_ERR_NO_LEAVE'             => array('20032', '当前不能请假'),
+        'MSG_ERR_NO_LEAVE'             => array('20032', '正在请假中'),
 
         'MSG_ERR_NO_CANCEL_LEAVE'      => array('20033', '当前不能取消请假'),
+
+        'MSG_ERR_FAIL_TEACHER_ID'       => array('20034', '教师ID错误'),
+
+        'MSG_ERR_NULL_TEACHER'       => array('20035', '没有教师信息'),
+
+        'MSG_ERR_FAIL_PRODUCE_ID'       => array('20036', '作品ID错误'),
+
+        'MSG_ERR_FAIL_PRODUCE'       => array('20037', '没有作品信息'),
 
 		// 其它
 		'MSG_ERR_UNKOWN'			=> array('99999', '未知错误')
