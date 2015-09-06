@@ -166,7 +166,7 @@ class UserScoreHistory extends CActiveRecord
     }
 
     /**
-     * 输入 状态 reason 1-2
+     * 输入 状态 reason 1-7
      * 输出 对应的积分变化原因 签到，抽奖等等
      * @param $reason
      * @return string
@@ -178,6 +178,16 @@ class UserScoreHistory extends CActiveRecord
                 return "签到";
             case "2":
                 return "抽奖";
+            case "3":
+                return "绑定手机，注册成功";
+            case "4":
+                return "推荐用户";
+            case "5":
+                return "课程评价";
+            case "6":
+                return "答题";
+            case "7":
+                return "分享";
             default:
                 return "";
         }

@@ -85,6 +85,10 @@ $_error_code = array(
 
         'MSG_ERR_FAIL_PRODUCE'       => array('20037', '没有作品信息'),
 
+        'MSG_ERR_FAIL_EVAL_ID'       => array('20038', '评价ID错误'),
+
+        'MSG_ERR_FAIL_EVAL'       => array('20039', '没有评价信息'),
+
 		// 其它
 		'MSG_ERR_UNKOWN'			=> array('99999', '未知错误')
 );

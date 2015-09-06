@@ -49,6 +49,7 @@ class User extends CActiveRecord
     {
 //        $passwordMd5 = md5($password);
         $data = array();
+        $nowTime = date("Y-m-d H-i-s");              //当前时间
         try {
             if(self::getUserByMobile($mobile)) {
                 return 20001;       // MSG_ERR_INVALID_MOBILE
@@ -63,7 +64,20 @@ class User extends CActiveRecord
             $recommand = self::getUserByMobile($referee);                   // 推荐人用户ID
             if(!$recommand) {
                 $recommand = null;
+            } else {
+                // 推荐人存在
+                // 用户注册填写的推荐人积分增加 150
+                $change         = 150;
+                $reason         = 4;           // 积分变化类型 scoreChangeByReason($reason) 获得类型
+                $scoreRest      = UserScoreHistory::model()->getPoint($recommand) + $change;
+                $createTs       = $nowTime;
+                $memo           = null;
+
+                // 积分变化记录历史
+                $scoreHistory = UserScoreHistory::model()->insertScoreHistory($recommand, $change, $reason, $scoreRest, $createTs, $memo);
+                $scoreUpdate = UserScoreHistory::model()->updateUserScore($recommand, $scoreRest);
             }
+
             Yii::app()->cnhutong_user->createCommand()
                 ->insert('user',
                     array(
@@ -268,6 +282,7 @@ class User extends CActiveRecord
     public function bindMobile($mobile, $password, $checkNum, $token, $userId, $referee)
     {
         $data = array();
+        $nowTime = date("Y-m-d H:m:i");
         try {
             $user = self::IsUserId($userId);
             if(!$user) {
@@ -307,18 +322,19 @@ class User extends CActiveRecord
                     array(':mobile' => $mobile)
                 );
 
-            //userId
-//            $data['userId'] = $userId;
-            //token
-//            $data['token'] = UserToken::model()->getToken($userId);
             //用户昵称，积分，等级
             $userMessage = self::getUserMessageByUserId($userId);
-//            $data['mobile']             = $userMessage['mobile'];
             $data['nickname']           = $userMessage['username'];
-//            $data['points']             = $userMessage['score'];
-//            $data['level']              = $userMessage['level'];
-            //members
-//            $data['members'] = UserMember::model()->getMembers($userId);
+            // 绑定手机（注册）成功，增加积分
+            $change         = 200;          // 绑定手机/注册 增加200积分
+            $reason         = 3;           // 积分变化类型 scoreChangeByReason($reason) 获得类型
+            $scoreRest      = UserScoreHistory::model()->getPoint($userId) + $change;
+            $createTs       = $nowTime;
+            $memo           = null;
+
+            // 积分变化记录历史
+            $scoreHistory = UserScoreHistory::model()->insertScoreHistory($userId, $change, $reason, $scoreRest, $createTs, $memo);
+            $scoreUpdate = UserScoreHistory::model()->updateUserScore($userId, $scoreRest);
 
         } catch (Exception $e) {
             error_log($e);

@@ -73,7 +73,7 @@ class HtLessonStudent extends CActiveRecord
                 $subjectInfo = ApiPublicLesson::model()->getSubjectInfoById($subjectId);
                 $lesson['subjectName']                       = $subjectInfo['title'] . '课';
                 $lesson['subjectPic']                        = $subjectInfo['feature_img'];
-                $lesson['lessonSerial']                      = '第' . $row['lessonSerial'] . '课时';
+                $lesson['lessonSerial']                      = '第' . $row['lessonSerial'] . '次课';
                 $lessonDate = $row['lessonDate'];
                 $aDate = explode('-', $lessonDate);
                 $lesson['lessonDate']                        = $aDate[1] . '月' . $aDate[2] . '日' . ' ' . $row['lessonTime'];
@@ -440,6 +440,18 @@ class HtLessonStudent extends CActiveRecord
                         ':id' => $lessonStudentId
                     )
                 );
+
+            // 课程评价
+            // 学员评价课程，积分增加 50
+            $change         = 50;
+            $reason         = 5;           // 积分变化类型 scoreChangeByReason($reason) 获得类型
+            $scoreRest      = UserScoreHistory::model()->getPoint($userId) + $change;
+            $createTs       = $nowTime;
+            $memo           = null;
+
+            // 积分变化记录历史
+            $scoreHistory = UserScoreHistory::model()->insertScoreHistory($userId, $change, $reason, $scoreRest, $createTs, $memo);
+            $scoreUpdate = UserScoreHistory::model()->updateUserScore($userId, $scoreRest);
 
 //            $data = $result;
         } catch (Exception $e) {

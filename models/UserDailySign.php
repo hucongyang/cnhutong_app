@@ -128,7 +128,7 @@ class UserDailySign extends CActiveRecord
                 return 20027;
             }
 
-            $change = rand(10, 50);       // 用户抽奖后获取的积分值
+            $change = rand(1, 500);       // 用户抽奖后获取的积分值
             $reason = 2;                  // 积分变化类型 scoreChangeByReason($reason) 获得类型
             $scoreRest      = UserScoreHistory::model()->getPoint($userId) + $change;
             $createTs       = $nowTime;

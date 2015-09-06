@@ -141,8 +141,8 @@ class ProductController extends ApiPublicController
             $this->_return('MSG_ERR_FAIL_EVAL_ID');
         }
 
-        $data = ComTeacher::model()->evalTeacherStudent($teacherId);
-        if($data === 20035) {
+        $data = ComTeacher::model()->evalTeacherStudent($teacherId, $evalId);
+        if($data === 20039) {
             $this->_return('MSG_ERR_NULL_TEACHER');
         }
 
@@ -234,7 +234,7 @@ class ProductController extends ApiPublicController
         $data = ComTeacher::model()->getTeacherProductInfo($productId);
 
         // TODO : add log
-        $actionId = 2504;
+        $actionId = 2505;
         $params = '';
         foreach($_REQUEST as $key => $value) {
             $params .= $key . '=' . $value . '&';

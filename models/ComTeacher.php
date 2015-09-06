@@ -120,12 +120,58 @@ class ComTeacher extends CActiveRecord
     /**
      * 获取秦汉胡同老师所教课程的学生评价
      * @param $teacherId
+     * @param $evalId
      * @return array
      */
-    public function evalTeacherStudent($teacherId)
+    public function evalTeacherStudent($teacherId, $evalId)
     {
         $data = array();
         try {
+            $evaluates = array();
+            if($evalId == 0) {
+                $evaluates = Yii::app()->cnhutong_user->createCommand()
+                    ->select('id, member_id, lesson_student_id, teach_attitude, teach_content, teach_environment, statement, create_ts, teacher_id, teacher_statement, teacher_create_ts')
+                    ->from('lesson_student_eval')
+                    ->where('teacher_id = :teacherId', array(':teacherId' => $teacherId))
+                    ->order('id asc')
+                    ->limit('10')
+                    ->queryAll();
+            } else {
+                $evaluates = Yii::app()->cnhutong_user->createCommand()
+                    ->select('id, member_id, lesson_student_id, teach_attitude, teach_content, teach_environment, statement, create_ts, teacher_id, teacher_statement, teacher_create_ts')
+                    ->from('lesson_student_eval')
+                    ->where('teacher_id = :teacherId And id > :evalId', array(':teacherId' => $teacherId, ':evalId' => $evalId))
+                    ->order('id asc')
+                    ->limit('10')
+                    ->queryAll();
+            }
+
+            if(!$evaluates) {
+                return 20039;           // MSG_ERR_FAIL_EVAL
+            }
+
+            foreach($evaluates as $row) {
+                $result = array();
+                $result['evalId']                               = $row['id'];
+                $result['studentId']                            = $row['member_id'];
+                $result['studentName']                          = ApiPublicLesson::model()->getNameByMemberId($row['member_id']);
+                $courseId = self::getCourseByLessonStudentId($row['lesson_student_id']);
+                $subjectId = ApiPublicLesson::model()->getSubjectIdByCourseId($courseId);
+                $subjectInfo = ApiPublicLesson::model()->getSubjectInfoById($subjectId);
+                $result['studentSubject']                       = $subjectInfo['title'];
+                $create = date("Y-m-d", strtotime($row['create_ts']));
+                $result['studentTime']                            = $create;
+                $result['studentContent']                            = $row['statement'];
+                $result['studentCharge']  = number_format(( $row['teach_attitude'] + $row['teach_content'] + $row['teach_environment'] ) / 3, 1) ;
+                $result['teacherReplyContent']                   = $row['teacher_statement'];
+                if(!$row['teacher_statement']) {
+                    $replyTime = '';
+                } else {
+                    $replyTime = date("Y-m-d", strtotime($row['teacher_create_ts']));
+                }
+                $result['teacherReplyTime']                   = $replyTime;
+                $data['evaluates'][] = $result;
+            }
 
         } catch (Exception $e) {
             error_log($e);
@@ -247,5 +293,25 @@ class ComTeacher extends CActiveRecord
             error_log($e);
         }
         return $data;
+    }
+
+    /**
+     * 根据课时唯一ID获得该课时学员的课程 courseId
+     * @param $lessonStudentId
+     * @return string
+     */
+    public function getCourseByLessonStudentId($lessonStudentId)
+    {
+        $courseId = 0;
+        try {
+            $courseId = Yii::app()->cnhutong->createCommand()
+                ->select('course_id')
+                ->from('ht_lesson_student')
+                ->where('id = :id', array(':id' => $lessonStudentId))
+                ->queryScalar();
+        } catch (Exception $e) {
+            error_log($e);
+        }
+        return $courseId;
     }
 }

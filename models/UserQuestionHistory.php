@@ -205,7 +205,14 @@ class UserQuestionHistory extends CActiveRecord
 //            $data['scores'] = $scores;
             $data['percent'] = $percent[0];
             $data['testScore'] = $score;
-            $data['point'] = '10分';             // 做题积分功能待定
+
+            // 答题得积分 （用户每天首轮答题，1题2积分）
+            if(self::IssetQuestion($userId, $testId)) {
+                $data['point'] = ($score / 20) * 2;
+            } else {
+                $data['point'] = '0分';
+            }
+
 
         } catch (Exception $e) {
             error_log($e);
@@ -264,6 +271,11 @@ class UserQuestionHistory extends CActiveRecord
         return $scores;
     }
 
+    /**
+     * 根据测试编号获得科目测试人数
+     * @param $testId
+     * @return int
+     */
     public function testUsers($testId)
     {
         $testUsers = 0;
@@ -283,5 +295,35 @@ class UserQuestionHistory extends CActiveRecord
             error_log($e);
         }
         return $testUsers;
+    }
+
+    /**
+     * @param $userId
+     * @param $testId
+     * @return bool
+     */
+    public function IssetQuestion($userId, $testId)
+    {
+        $nowTime = date("Y-m-d");
+        try {
+            $update_ts = Yii::app()->cnhutong_user->createCommand()
+                ->select('update_ts')
+                ->from('user_question_history')
+                ->where('id = :testId And user_id = :userId', array(':testId' => $testId, ':userId' => $userId))
+                ->queryScalar();
+            if(!$update_ts) {
+                return true;
+            } else {
+                $updateTime = strtotime(date("Y-m-d", strtotime($update_ts)));        // 答案提交时间 格式：年月日时间戳
+                $nowTime = strtotime($nowTime);                                         // 现在时间 格式：年月日时间戳
+                if($nowTime == $updateTime) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+        } catch (Exception $e) {
+            error_log($e);
+        }
     }
 }
