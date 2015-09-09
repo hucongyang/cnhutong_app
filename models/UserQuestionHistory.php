@@ -194,6 +194,25 @@ class UserQuestionHistory extends CActiveRecord
                     )
                 );
 
+            // 答题得积分 （用户每天首轮答题，1题2积分）
+            $point = count(array_intersect_assoc($aRightAnswer, $aAnswer)) * 2;     // 答对题数获得的积分，1题2分
+            $count = count(self::IssetQuestion($userId));
+            if($count > 1) {
+                $pointChange = 0;
+            } else {
+                $pointChange = $point;
+            }
+
+            $change         = $pointChange;
+            $reason         = 6;           // 积分变化类型 scoreChangeByReason($reason) 获得类型
+            $scoreRest      = UserScoreHistory::model()->getPoint($userId) + $pointChange;
+            $createTs       = $nowTime;
+            $memo           = null;
+
+            // 积分变化记录历史
+            $scoreHistory = UserScoreHistory::model()->insertScoreHistory($userId, $change, $reason, $scoreRest, $createTs, $memo);
+            $scoreUpdate = UserScoreHistory::model()->updateUserScore($userId, $scoreRest);
+
             // 获得此课程类型的所有答题分数
             $scores = self::getAllScores($testId);
             // 得分在分数组中位置
@@ -205,14 +224,7 @@ class UserQuestionHistory extends CActiveRecord
 //            $data['scores'] = $scores;
             $data['percent'] = $percent[0];
             $data['testScore'] = $score;
-
-            // 答题得积分 （用户每天首轮答题，1题2积分）
-            if(self::IssetQuestion($userId, $testId)) {
-                $data['point'] = ($score / 20) * 2;
-            } else {
-                $data['point'] = '0分';
-            }
-
+            $data['point'] = $pointChange;
 
         } catch (Exception $e) {
             error_log($e);
@@ -299,31 +311,21 @@ class UserQuestionHistory extends CActiveRecord
 
     /**
      * @param $userId
-     * @param $testId
-     * @return bool
+     * @return array
      */
-    public function IssetQuestion($userId, $testId)
+    public function IssetQuestion($userId)
     {
+        $id = array();
         $nowTime = date("Y-m-d");
         try {
-            $update_ts = Yii::app()->cnhutong_user->createCommand()
-                ->select('update_ts')
+            $id = Yii::app()->cnhutong_user->createCommand()
+                ->select('id')
                 ->from('user_question_history')
-                ->where('id = :testId And user_id = :userId', array(':testId' => $testId, ':userId' => $userId))
-                ->queryScalar();
-            if(!$update_ts) {
-                return true;
-            } else {
-                $updateTime = strtotime(date("Y-m-d", strtotime($update_ts)));        // 答案提交时间 格式：年月日时间戳
-                $nowTime = strtotime($nowTime);                                         // 现在时间 格式：年月日时间戳
-                if($nowTime == $updateTime) {
-                    return false;
-                } else {
-                    return true;
-                }
-            }
+                ->where('user_id = :userId And DATE(update_ts) = :nowTime', array(':userId' => $userId, ':nowTime' => $nowTime))
+                ->queryAll();
         } catch (Exception $e) {
             error_log($e);
         }
+        return $id;
     }
 }

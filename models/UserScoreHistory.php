@@ -179,7 +179,7 @@ class UserScoreHistory extends CActiveRecord
             case "2":
                 return "抽奖";
             case "3":
-                return "绑定手机，注册成功";
+                return "绑定手机";
             case "4":
                 return "推荐用户";
             case "5":
@@ -188,6 +188,8 @@ class UserScoreHistory extends CActiveRecord
                 return "答题";
             case "7":
                 return "分享";
+            case "8":
+                return "注册成功";
             default:
                 return "";
         }

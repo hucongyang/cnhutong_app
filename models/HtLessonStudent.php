@@ -141,6 +141,7 @@ class HtLessonStudent extends CActiveRecord
                 $subject['lessonArrangeId']                  = $row['id'];
                 $subjectInfo = ApiPublicLesson::model()->getSubjectInfoById($subjectId);
                 $subject['subjectName']                       = $subjectInfo['title'] . '课';
+                $subject['subjectPic']                        = $subjectInfo['feature_img'];
                 $subject['teacherId']                           = $row['teacher_id'];
                 $subject['teacherName']                         = ApiPublicLesson::model()->getNameByMemberId($row['teacher_id']) . '老师';
                 $cnt                                             = $row['cnt'];

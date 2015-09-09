@@ -36,7 +36,7 @@ return array(
 		),
 		// uncomment the following to use a MySQL database
 
-        // 对接数据库
+        // 对接数据库 价值中心CMS
         'cnhutong'=>array(
             'connectionString' => 'mysql:host=127.0.0.1;dbname=cnhutong',
             'emulatePrepare' => true,
@@ -46,6 +46,18 @@ return array(
             'class' =>  'CDbConnection',
             //'tablePrefix' => 'tbl_',
         ),
+
+        // 对接数据库 织梦CMS
+        'dede'=>array(
+            'connectionString' => 'mysql:host=127.0.0.1;dbname=dedecmsv53utf8',
+            'emulatePrepare' => true,
+            'username' => 'root',
+            'password' => '111111',
+            'charset' => 'utf8',
+            'class' =>  'CDbConnection',
+            //'tablePrefix' => 'tbl_',
+        ),
+
 
         'cnhutong_user'=>array(
             'connectionString' => 'mysql:host=127.0.0.1;dbname=cnhutong_user',

@@ -89,6 +89,12 @@ $_error_code = array(
 
         'MSG_ERR_FAIL_EVAL'       => array('20039', '没有评价信息'),
 
+        'MSG_ERR_FAIL_NEWS_ID'       => array('20040', '新闻ID错误'),
+
+        'MSG_ERR_FAIL_NEWS_TYPE_ID'       => array('20041', '新闻类型ID错误'),
+
+        'MSG_ERR_FAIL_NEWS'       => array('20042', '没有新闻信息'),
+
 		// 其它
 		'MSG_ERR_UNKOWN'			=> array('99999', '未知错误')
 );
