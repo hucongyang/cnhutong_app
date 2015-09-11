@@ -131,9 +131,6 @@ class LogMobileCheckcode extends CActiveRecord
             return 10002;       //MSG_ERR_FAIL_PARAM
         }
 
-        // 短信接口
-
-//        return true;
         return $checkNum;       // 返回的验证码目前测试用，正式上线去除
     }
 

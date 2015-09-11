@@ -192,6 +192,9 @@ class ProductController extends ApiPublicController
         }
 
         $data = ComTeacher::model()->getTeacherProducts($teacherId, $productId);
+        if($data === 20037) {
+            $this->_return('MSG_ERR_FAIL_PRODUCT');
+        }
 
         // TODO : add log
         $actionId = 2504;

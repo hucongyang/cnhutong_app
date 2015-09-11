@@ -209,7 +209,7 @@ class ComTeacher extends CActiveRecord
             }
 
             if(!$products) {
-                $data['products'][] = array();
+                return 20037;           // MSG_ERR_FAIL_PRODUCT
             }
 
             foreach($products as $row) {

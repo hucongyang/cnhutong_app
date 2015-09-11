@@ -83,7 +83,7 @@ $_error_code = array(
 
         'MSG_ERR_FAIL_PRODUCE_ID'       => array('20036', '作品ID错误'),
 
-        'MSG_ERR_FAIL_PRODUCE'       => array('20037', '没有作品信息'),
+        'MSG_ERR_FAIL_PRODUCT'       => array('20037', '没有作品信息'),
 
         'MSG_ERR_FAIL_EVAL_ID'       => array('20038', '评价ID错误'),
 
@@ -94,6 +94,12 @@ $_error_code = array(
         'MSG_ERR_FAIL_NEWS_TYPE_ID'       => array('20041', '新闻类型ID错误'),
 
         'MSG_ERR_FAIL_NEWS'       => array('20042', '没有新闻信息'),
+
+        'MSG_ERR_FAIL_SHARE_TYPE'       => array('20043', '分享类型错误'),
+
+        'MSG_ERR_FAIL_SHARE_ID'       => array('20044', '分享对应ID错误'),
+
+        'MSG_ERR_FAIL_PLATFORM'       => array('20045', '分享平台ID错误'),
 
 		// 其它
 		'MSG_ERR_UNKOWN'			=> array('99999', '未知错误')

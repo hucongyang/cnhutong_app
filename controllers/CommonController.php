@@ -213,4 +213,57 @@ class CommonController extends ApiPublicController
 
         $this->_return('MSG_SUCCESS');
     }
+
+    /**
+     * action_id : 2206
+     * @userId $userId                  -- 用户ID
+     * @shareType $shareType            -- 分享类型  1-文章，2-题库测试
+     * @shareId $shareId                -- 分享对应文章ID/对应测试ID。类型决定所传ID
+     * @platform $platform              -- 用户分享文章或测试的平台 1-微信，2-QQ ...
+     * 获取APP中所有分享成功的相关数据
+     * @return result          调用返回结果
+     * @return msg             调用返回结果说明
+     * @return data             调用返回数据
+     */
+    public function actionPostShareInfo()
+    {
+        if(!isset($_REQUEST['userId']) || !isset($_REQUEST['shareType']) ||
+        !isset($_REQUEST['shareId']) || !isset($_REQUEST['platform']))
+        {
+            $this->_return('MSG_ERR_LESS_PARAM');
+        }
+
+        $userId = Yii::app()->request->getParam('userId', NULL);
+        $shareType = Yii::app()->request->getParam('shareType', NULL);
+        $shareId = Yii::app()->request->getParam('shareId', NULL);
+        $platform = Yii::app()->request->getParam('platform', NULL);
+
+        if(!ctype_digit($userId)) {
+            $this->_return('MSG_ERR_FAIL_USER');
+        }
+
+        if(!in_array($shareType, [1, 2])) {
+            $this->_return('MSG_ERR_FAIL_SHARE_TYPE');
+        }
+
+        if(!ctype_digit($shareId)) {
+            $this->_return('MSG_ERR_FAIL_SHARE_ID');
+        }
+
+        if(!ctype_digit($platform)) {
+            $this->_return('MSG_ERR_FAIL_PLATFORM');
+        }
+
+        $data = LogUserShare::model()->postShareInfo($userId, $shareType, $shareId, $platform);
+
+        // TODO : add log
+        $actionId = 2203;
+        $params = '';
+        foreach($_REQUEST as $key => $value) {
+            $params .= $key . '=' . $value . '&';
+        }
+        LogUserAction::model()->userAction($userId, $actionId, $params);
+
+        $this->_return('MSG_SUCCESS', $data);
+    }
 }

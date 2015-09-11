@@ -310,6 +310,7 @@ class UserQuestionHistory extends CActiveRecord
     }
 
     /**
+     * 当前日期是否答题
      * @param $userId
      * @return array
      */
